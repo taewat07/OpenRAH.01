@@ -5,3 +5,4 @@ graphify-out/
 *.inspect.ndjson
 .RAH01_Template.rebuild-*
 SafeCode/
+SPEC.md

@@ -83,7 +83,6 @@ This project provides software infrastructure, not medical or legal advice.
 - `RAH01_Template.xlsx` — Google Sheets-ready database template
 - `AppsScript/` — copy-ready Apps Script backend and packaged web app
 - `assets/` — styles, scripts, icons, and section artwork
-- `SPEC.md` — data contract and implementation specification
 
 ## License
 
