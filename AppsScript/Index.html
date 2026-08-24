@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@10..48,75..100,700;800&family=IBM+Plex+Mono:wght@600;700&family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <title>RAH.01 — แบบประเมินความเสี่ยงทางสุขภาพ</title>
+  <?!= include('Styles'); ?>
+</head>
+<body>
+  <a class="skip-link" href="#rahForm">ข้ามไปยังแบบประเมิน</a>
+  <div class="app-shell">
+    <aside class="rail" id="mobileDrawer" aria-label="เมนูส่วนแบบประเมิน" aria-hidden="false">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">R1</span>
+        <div class="brand-copy">
+          <strong>RAH.01</strong>
+          <small>Risk Assessment Form</small>
+        </div>
+        <button class="drawer-close" id="drawerClose" type="button" aria-label="ปิดเมนู">×</button>
+      </div>
+      <p class="rail-label">Assessment flow</p>
+      <nav class="section-nav">
+        <button class="nav-item active" data-target="header-section"><span class="nav-index">01</span><span class="nav-copy"><strong>ข้อมูลการประเมิน</strong><small>Assessment details</small></span></button>
+        <button class="nav-item" data-target="checklist-section"><span class="nav-index">02</span><span class="nav-copy"><strong>ระบบอาชีวอนามัย</strong><small>OH system</small></span></button>
+        <button class="nav-item" data-target="steps-section"><span class="nav-index">03</span><span class="nav-copy"><strong>ขั้นตอนการทำงาน</strong><small>Work processes</small></span></button>
+        <button class="nav-item" data-target="hazards-section"><span class="nav-index">04</span><span class="nav-copy"><strong>ประเมินสิ่งคุกคาม</strong><small>Eight categories</small></span></button>
+        <button class="nav-item" data-target="summary-section"><span class="nav-index">05</span><span class="nav-copy"><strong>สรุปความเสี่ยง</strong><small>Derived summary</small></span></button>
+      </nav>
+      <div class="rail-note">
+        <span>FORM 1.1.0</span>
+        <p>ข้อมูลคำนวณคะแนนและหน่วยงานถูกตรวจสอบซ้ำโดยระบบส่วนกลาง</p>
+      </div>
+    </aside>
+
+    <button class="drawer-backdrop" id="drawerBackdrop" type="button" aria-label="ปิดเมนู" tabindex="-1"></button>
+
+    <main>
+      <header class="topbar">
+        <div class="topbar-start">
+          <button class="menu-toggle" id="menuToggle" type="button" aria-label="เปิดเมนู" aria-controls="mobileDrawer" aria-expanded="false"><span class="menu-icon" aria-hidden="true"></span></button>
+        </div>
+        <div class="top-actions">
+          <button class="button icon-action" id="printButton" type="button" aria-label="พิมพ์" data-tooltip="พิมพ์">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8V3h10v5M7 17H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M7 14h10v7H7zM17 11h.01"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="content">
+        <section class="hero" id="overview">
+          <div>
+            <h1>แบบประเมิน<span>ความเสี่ยง</span>ทางสุขภาพ</h1>
+            <p id="hospitalTitle">RAH.01 · Your Hospital Name</p>
+          </div>
+        </section>
+
+        <form id="rahForm" novalidate>
+          <section class="form-section" id="header-section">
+            <div class="section-heading">
+              <div><div class="section-kicker">Section 01</div><h2>ข้อมูลการประเมิน</h2><p>Assessment details</p></div>
+              <span class="section-tag">ยืนยันโดยระบบ 2 รายการ</span>
+            </div>
+            <div class="section-body">
+              <div class="field-grid">
+                <div class="field span-3"><label for="assessmentDate">วันที่ทำการประเมิน <span class="required">*</span><small>Assessment date</small></label><input id="assessmentDate" type="date" required></div>
+                <div class="field"><label for="department">งาน / แผนก <span class="required">*</span><small>Assessed department · จากรายการที่ผู้ดูแลกำหนด</small></label><select id="department" name="departmentId" required aria-describedby="departmentStatus"><option value="">กำลังโหลดรายการแผนก…</option></select><small class="field-status" id="departmentStatus" aria-live="polite">กำลังเชื่อมต่อการตั้งค่า</small></div>
+                <div class="field span-3"><label for="staffTotal">จำนวนผู้ปฏิบัติงานทั้งหมด <span class="required">*</span><small>Total staff</small></label><input id="staffTotal" type="number" min="1" value="34" required></div>
+                <div class="field span-4"><label for="evaluator">ผู้ประเมิน<small>Evaluator · ระบุชื่อผู้ประเมิน</small></label><input id="evaluator" value="นางทดลอง ทดสอบ"></div>
+                <div class="field span-8"><label for="additionalEvaluators">ผู้ร่วมประเมิน<small>Additional evaluators · ไม่บังคับ</small></label><input id="additionalEvaluators" placeholder="ระบุชื่อผู้ร่วมประเมิน"></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="form-section" id="checklist-section">
+            <div class="section-heading">
+              <div><div class="section-kicker">Section 02</div><h2>ระบบอาชีวอนามัยในแผนก</h2><p>Occupational health system checklist</p></div>
+              <span class="section-tag" id="checklistCount">0 / 10 รายการ</span>
+            </div>
+            <div class="section-body"><div class="checklist" id="checklist"></div></div>
+          </section>
+
+          <section class="form-section" id="steps-section">
+            <div class="section-heading">
+              <div><div class="section-kicker">Section 03</div><h2>ขั้นตอนการทำงาน</h2><p>Work process and task inventory</p></div>
+              <span class="section-tag" id="stepCount">2 ขั้นตอน</span>
+            </div>
+            <div class="section-body">
+              <div class="step-list" id="stepList"></div>
+              <button class="button add-row" id="addStepButton" type="button">＋ เพิ่มขั้นตอนการทำงาน</button>
+            </div>
+          </section>
+
+          <section class="form-section" id="hazards-section">
+            <div class="section-heading">
+              <div><div class="section-kicker">Section 04</div><h2>ประเมินสิ่งคุกคาม 8 หมวด</h2><p>Hazard evaluation · ตอบทุกแถวอย่างชัดเจน</p></div>
+              <span class="section-tag" id="hazardCount">0 / 49 รายการ</span>
+            </div>
+            <div class="section-body">
+              <div class="legend">
+                <span class="legend-item"><span class="legend-dot low"></span>ต่ำ 1–2</span>
+                <span class="legend-item"><span class="legend-dot medium"></span>ปานกลาง 3–4</span>
+                <span class="legend-item"><span class="legend-dot high"></span>สูง 6–9</span>
+              </div>
+              <div class="category-list" id="categoryList"></div>
+            </div>
+          </section>
+
+          <section class="form-section" id="summary-section">
+            <div class="section-heading">
+              <div><div class="section-kicker">Section 05</div><h2>สรุปความเสี่ยงอัตโนมัติ</h2><p>Derived risk summary · เรียงจากความเสี่ยงสูงสุด</p></div>
+              <span class="section-tag" id="summaryCount">0 ความเสี่ยง</span>
+            </div>
+            <div class="section-body" id="summaryBody"></div>
+          </section>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <footer class="sticky-submit">
+    <div class="save-state"><strong>แบบร่างยังไม่ส่ง</strong><br><span id="saveStateText">บันทึกเฉพาะในเบราว์เซอร์เซสชันนี้</span></div>
+    <div class="footer-progress" id="footerProgress" role="progressbar" aria-label="ความคืบหน้าการกรอกแบบประเมิน" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <div class="footer-progress-meta"><span>ความคืบหน้า</span><strong id="progressValue">0%</strong></div>
+      <div class="progress-segments" aria-hidden="true">
+        <span class="progress-segment"></span><span class="progress-segment"></span><span class="progress-segment"></span><span class="progress-segment"></span><span class="progress-segment"></span>
+        <span class="progress-segment"></span><span class="progress-segment"></span><span class="progress-segment"></span><span class="progress-segment"></span><span class="progress-segment"></span>
+        <span class="progress-segment"></span><span class="progress-segment"></span><span class="progress-segment"></span><span class="progress-segment"></span><span class="progress-segment"></span>
+        <span class="progress-segment"></span><span class="progress-segment"></span><span class="progress-segment"></span><span class="progress-segment"></span><span class="progress-segment"></span>
+      </div>
+    </div>
+    <div class="submit-actions">
+      <button class="button icon-action" id="saveBottomButton" type="button" aria-label="บันทึกร่าง" data-tooltip="บันทึกร่าง">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3h13l3 3v15H4z"/><path d="M8 3v6h8V3M8 21v-7h8v7"/></svg>
+      </button>
+      <button class="button primary icon-action" id="reviewButton" type="button" aria-label="ส่ง" data-tooltip="ส่ง">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4zM22 2 11 13"/></svg>
+      </button>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <?!= include('Scripts'); ?>
+</body>
+</html>

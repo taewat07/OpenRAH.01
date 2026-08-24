@@ -1,0 +1,818 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@10..48,75..100,700;800&family=IBM+Plex+Mono:wght@600;700&family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <title>RAH.01 — แบบประเมินความเสี่ยงทางสุขภาพ</title>
+  <link rel="stylesheet" href="assets/css/rah-design-system.css?v=20260825-5">
+  <link rel="stylesheet" href="assets/css/rah-assessment-editor.css?v=20260825-5">
+</head>
+<body>
+  <a class="skip-link" href="#rahForm">ข้ามไปยังแบบประเมิน</a>
+  <div class="app-shell">
+    <aside class="rail" id="mobileDrawer" aria-label="เมนูส่วนแบบประเมิน" aria-hidden="false">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">R1</span>
+        <div class="brand-copy">
+          <strong>RAH.01</strong>
+          <small>Risk Assessment Form</small>
+        </div>
+        <button class="drawer-close" id="drawerClose" type="button" aria-label="ปิดเมนู">×</button>
+      </div>
+      <p class="rail-label">Assessment flow</p>
+      <nav class="section-nav">
+        <button class="nav-item active" data-target="header-section"><span class="nav-index">01</span><span class="nav-copy"><strong>ข้อมูลการประเมิน</strong><small>Assessment details</small></span></button>
+        <button class="nav-item" data-target="checklist-section"><span class="nav-index">02</span><span class="nav-copy"><strong>ระบบอาชีวอนามัย</strong><small>OH system</small></span></button>
+        <button class="nav-item" data-target="steps-section"><span class="nav-index">03</span><span class="nav-copy"><strong>ขั้นตอนการทำงาน</strong><small>Work processes</small></span></button>
+        <button class="nav-item" data-target="hazards-section"><span class="nav-index">04</span><span class="nav-copy"><strong>ประเมินสิ่งคุกคาม</strong><small>Eight categories</small></span></button>
+        <button class="nav-item" data-target="summary-section"><span class="nav-index">05</span><span class="nav-copy"><strong>สรุปความเสี่ยง</strong><small>Derived summary</small></span></button>
+      </nav>
+      <div class="rail-note">
+        <span>FORM 1.1.0</span>
+        <p>ข้อมูลคำนวณคะแนนและหน่วยงานถูกตรวจสอบซ้ำโดยระบบส่วนกลาง</p>
+      </div>
+    </aside>
+
+    <button class="drawer-backdrop" id="drawerBackdrop" type="button" aria-label="ปิดเมนู" tabindex="-1"></button>
+
+    <main>
+      <header class="topbar">
+        <div class="topbar-start">
+          <button class="menu-toggle" id="menuToggle" type="button" aria-label="เปิดเมนู" aria-controls="mobileDrawer" aria-expanded="false"><span class="menu-icon" aria-hidden="true"></span></button>
+        </div>
+        <div class="top-actions">
+          <button class="button icon-action" id="printButton" type="button" aria-label="พิมพ์" data-tooltip="พิมพ์">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8V3h10v5M7 17H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M7 14h10v7H7zM17 11h.01"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="content">
+        <section class="hero" id="overview">
+          <div>
+            <h1>แบบประเมิน<span>ความเสี่ยง</span>ทางสุขภาพ</h1>
+            <p id="hospitalTitle">RAH.01 · Your Hospital Name</p>
+          </div>
+        </section>
+
+        <form id="rahForm" novalidate>
+          <section class="form-section" id="header-section">
+            <div class="section-heading">
+              <div><div class="section-kicker">Section 01</div><h2>ข้อมูลการประเมิน</h2><p>Assessment details</p></div>
+              <span class="section-tag">ยืนยันโดยระบบ 2 รายการ</span>
+            </div>
+            <div class="section-body">
+              <div class="field-grid">
+                <div class="field span-3"><label for="assessmentDate">วันที่ทำการประเมิน <span class="required">*</span><small>Assessment date</small></label><input id="assessmentDate" type="date" required></div>
+                <div class="field"><label for="department">งาน / แผนก <span class="required">*</span><small>Assessed department · จากรายการที่ผู้ดูแลกำหนด</small></label><select id="department" name="departmentId" required aria-describedby="departmentStatus"><option value="">กำลังโหลดรายการแผนก…</option></select><small class="field-status" id="departmentStatus" aria-live="polite">กำลังเชื่อมต่อการตั้งค่า</small></div>
+                <div class="field span-3"><label for="staffTotal">จำนวนผู้ปฏิบัติงานทั้งหมด <span class="required">*</span><small>Total staff</small></label><input id="staffTotal" type="number" min="1" value="34" required></div>
+                <div class="field span-4"><label for="evaluator">ผู้ประเมิน<small>Evaluator · ระบุชื่อผู้ประเมิน</small></label><input id="evaluator" value="นางทดลอง ทดสอบ"></div>
+                <div class="field span-8"><label for="additionalEvaluators">ผู้ร่วมประเมิน<small>Additional evaluators · ไม่บังคับ</small></label><input id="additionalEvaluators" placeholder="ระบุชื่อผู้ร่วมประเมิน"></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="form-section" id="checklist-section">
+            <div class="section-heading">
+              <div><div class="section-kicker">Section 02</div><h2>ระบบอาชีวอนามัยในแผนก</h2><p>Occupational health system checklist</p></div>
+              <span class="section-tag" id="checklistCount">0 / 10 รายการ</span>
+            </div>
+            <div class="section-body"><div class="checklist" id="checklist"></div></div>
+          </section>
+
+          <section class="form-section" id="steps-section">
+            <div class="section-heading">
+              <div><div class="section-kicker">Section 03</div><h2>ขั้นตอนการทำงาน</h2><p>Work process and task inventory</p></div>
+              <span class="section-tag" id="stepCount">2 ขั้นตอน</span>
+            </div>
+            <div class="section-body">
+              <div class="step-list" id="stepList"></div>
+              <button class="button add-row" id="addStepButton" type="button">＋ เพิ่มขั้นตอนการทำงาน</button>
+            </div>
+          </section>
+
+          <section class="form-section" id="hazards-section">
+            <div class="section-heading">
+              <div><div class="section-kicker">Section 04</div><h2>ประเมินสิ่งคุกคาม 8 หมวด</h2><p>Hazard evaluation · ตอบทุกแถวอย่างชัดเจน</p></div>
+              <span class="section-tag" id="hazardCount">0 / 49 รายการ</span>
+            </div>
+            <div class="section-body">
+              <div class="legend">
+                <span class="legend-item"><span class="legend-dot low"></span>ต่ำ 1–2</span>
+                <span class="legend-item"><span class="legend-dot medium"></span>ปานกลาง 3–4</span>
+                <span class="legend-item"><span class="legend-dot high"></span>สูง 6–9</span>
+              </div>
+              <div class="category-list" id="categoryList"></div>
+            </div>
+          </section>
+
+          <section class="form-section" id="summary-section">
+            <div class="section-heading">
+              <div><div class="section-kicker">Section 05</div><h2>สรุปความเสี่ยงอัตโนมัติ</h2><p>Derived risk summary · เรียงจากความเสี่ยงสูงสุด</p></div>
+              <span class="section-tag" id="summaryCount">0 ความเสี่ยง</span>
+            </div>
+            <div class="section-body" id="summaryBody"></div>
+          </section>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <footer class="sticky-submit">
+    <div class="save-state"><strong>แบบร่างยังไม่ส่ง</strong><br><span id="saveStateText">บันทึกเฉพาะในเบราว์เซอร์เซสชันนี้</span></div>
+    <div class="footer-progress" id="footerProgress" role="progressbar" aria-label="ความคืบหน้าการกรอกแบบประเมิน" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <div class="footer-progress-meta"><span>ความคืบหน้า</span><strong id="progressValue">0%</strong></div>
+      <div class="progress-segments" aria-hidden="true">
+        <span class="progress-segment"></span><span class="progress-segment"></span><span class="progress-segment"></span><span class="progress-segment"></span><span class="progress-segment"></span>
+        <span class="progress-segment"></span><span class="progress-segment"></span><span class="progress-segment"></span><span class="progress-segment"></span><span class="progress-segment"></span>
+        <span class="progress-segment"></span><span class="progress-segment"></span><span class="progress-segment"></span><span class="progress-segment"></span><span class="progress-segment"></span>
+        <span class="progress-segment"></span><span class="progress-segment"></span><span class="progress-segment"></span><span class="progress-segment"></span><span class="progress-segment"></span>
+      </div>
+    </div>
+    <div class="submit-actions">
+      <button class="button icon-action" id="saveBottomButton" type="button" aria-label="บันทึกร่าง" data-tooltip="บันทึกร่าง">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3h13l3 3v15H4z"/><path d="M8 3v6h8V3M8 21v-7h8v7"/></svg>
+      </button>
+      <button class="button primary icon-action" id="reviewButton" type="button" aria-label="ส่ง" data-tooltip="ส่ง">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4zM22 2 11 13"/></svg>
+      </button>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="assets/js/rah-shell.js"></script>
+  <script src="assets/js/rah-settings-data.js"></script>
+  <script src="assets/js/rah-department-service.js"></script>
+  <script>
+    const checklistItems = [
+      { key: 'occ_fire_safety', th: 'มีระบบป้องกัน/ระงับอัคคีภัย', en: 'Fire prevention and suppression system', na: false },
+      { key: 'occ_health_education', th: 'มีการให้ความรู้เรื่องอาชีวอนามัย', en: 'Occupational-health education', na: false },
+      { key: 'occ_waste_management', th: 'มีระบบการจัดการของเสียที่เป็นอันตราย', en: 'Hazardous-waste management system', na: false },
+      { key: 'occ_ppe_measures', th: 'มีมาตรการใช้อุปกรณ์ป้องกันอันตรายส่วนบุคคล', en: 'Personal protective equipment measures', na: false },
+      { key: 'occ_annual_health_exam', th: 'มีการตรวจสุขภาพร่างกายประจำปี', en: 'Annual health examination', na: false },
+      { key: 'occ_risk_exam_lung', th: 'ตรวจสุขภาพตามความเสี่ยง: สมรรถภาพปอด', en: 'Risk-based lung-function examination', na: true },
+      { key: 'occ_risk_exam_hearing', th: 'ตรวจสุขภาพตามความเสี่ยง: การได้ยิน', en: 'Risk-based hearing examination', na: true },
+      { key: 'occ_risk_exam_vision', th: 'ตรวจสุขภาพตามความเสี่ยง: การมองเห็น', en: 'Risk-based vision examination', na: true },
+      { key: 'occ_bio_exam', th: 'การตรวจทางชีวภาพ', en: 'Biological monitoring', na: true },
+      { key: 'occ_env_exam', th: 'การตรวจทางสิ่งแวดล้อม', en: 'Workplace environmental monitoring', na: true }
+    ];
+
+    const categories = [
+      { code: 'PHYSICAL', icon: 'assets/category-icons/physical.png', th: 'สิ่งคุกคามทางกายภาพ', en: 'Physical Hazards', hazards: [
+        ['heat', 'ความร้อน', 'Heat'], ['noise', 'เสียงดัง', 'Noise'], ['lighting', 'แสงสว่าง', 'Lighting'], ['vibration', 'ความสั่นสะเทือน', 'Vibration'], ['radiation', 'รังสี', 'Radiation']
+      ]},
+      { code: 'BIOLOGICAL', icon: 'assets/category-icons/biological.png', th: 'สิ่งคุกคามทางชีวภาพ', en: 'Biological Hazards', hazards: [
+        ['bacteria', 'แบคทีเรีย', 'Bacteria'], ['fungi_mold', 'รา / เชื้อรา', 'Fungi / Mold'], ['viruses', 'ไวรัส', 'Viruses']
+      ]},
+      { code: 'CHEMICAL', icon: 'assets/category-icons/chemical.png', th: 'สิ่งคุกคามทางเคมี', en: 'Chemical Hazards', hazards: [
+        ['hibitane_disinfectant_soap', 'น้ำยาล้างมือ Hibitane / สบู่ฆ่าเชื้อ', 'Hibitane / Disinfectant Soap'], ['toilet_cleaner', 'น้ำยาล้างห้องน้ำ', 'Toilet Cleaner'], ['alcohol_sanitizer', 'แอลกอฮอล์เจล / น้ำยาฆ่าเชื้อ', 'Alcohol Gel / Sanitizer'], ['floor_cleaner', 'น้ำยาถูพื้น', 'Floor Cleaner'], ['glass_cleaner', 'น้ำยาเช็ดกระจก', 'Glass Cleaner'], ['chemotherapy_agents', 'ยาเคมีบำบัด', 'Chemotherapy Agents'], ['acidic_agents_or_medicines', 'สารหรือยาที่มีฤทธิ์เป็นกรด', 'Acidic Agents or Medicines'], ['sterilization_disinfection_chemicals', 'สารเคมีล้างหรือฆ่าเชื้อเครื่องมือ', 'Sterilization / Disinfection Chemicals']
+      ]},
+      { code: 'ERGONOMIC', icon: 'assets/category-icons/ergonomic.png', th: 'สิ่งคุกคามทางการยศาสตร์', en: 'Ergonomic Hazards', hazards: [
+        ['heavy_lifting_patient_transfer', 'ออกแรงยกวัสดุ สิ่งของ หรือผู้ป่วยที่มีน้ำหนักมาก', 'Heavy Lifting / Patient Transfer'], ['lifting_with_twisting', 'ออกแรงยกของด้วยท่าทางบิดเบี้ยวตัว', 'Lifting with Twisting'], ['unnatural_posture', 'ท่าทางหรือการเคลื่อนไหวที่ฝืนธรรมชาติ', 'Unnatural Posture or Movement'], ['prolonged_standing_sitting', 'ยืนหรือนั่งทำงานอยู่กับที่ติดต่อกันนาน', 'Prolonged Standing or Sitting'], ['unsuitable_desk_chair', 'นั่งทำงานโดยมีโต๊ะหรือเก้าอี้ไม่เหมาะสม', 'Unsuitable Desk or Chair'], ['repetitive_tasks', 'รูปแบบการทำงานซ้ำๆ', 'Repetitive Tasks'], ['high_push_pull_force', 'การใช้แรงดึงหรือดันที่ต้องออกแรงมาก', 'High Push / Pull Force'], ['unsuitable_grip_equipment', 'ใช้อุปกรณ์ที่ไม่เหมาะกับการหยิบจับ', 'Unsuitable Equipment for Gripping']
+      ]},
+      { code: 'SAFETY_ACCIDENT', icon: 'assets/category-icons/safety.png', th: 'อุบัติเหตุและสภาพงานไม่ปลอดภัย', en: 'Safety and Accident Hazards', hazards: [
+        ['sharps', 'อุปกรณ์หรือเครื่องมือที่มีความแหลมหรือคม', 'Sharps / Needlestick'], ['machinery', 'การใช้เครื่องจักรกล', 'Machinery Operation'], ['vehicle_use', 'การใช้ยานพาหนะ', 'Vehicle Use'], ['work_at_height', 'การทำงานในที่สูง', 'Work at Height'], ['confined_space', 'การทำงานในที่คับแคบ', 'Confined Space Work'], ['slippery_surface', 'สภาพพื้นที่มีลักษณะลื่น', 'Slippery Surface'], ['hot_objects', 'การทำงานกับสิ่งของร้อน', 'Work with Hot Objects'], ['pathway_obstruction', 'มีสิ่งกีดขวางทางเดิน', 'Pathway Obstruction']
+      ]},
+      { code: 'FIRE_DISASTER', icon: 'assets/category-icons/fire.png', th: 'อัคคีภัยและภัยพิบัติ', en: 'Fire and Disaster Hazards', hazards: [
+        ['generator', 'การทำงานกับเครื่องกำเนิดไฟฟ้า', 'Generator Work'], ['electrical_work', 'การทำงานเกี่ยวกับไฟฟ้าหรือสายไฟ', 'Electrical Work / Wiring'], ['electrical_equipment', 'การใช้อุปกรณ์หรือเครื่องมือไฟฟ้า', 'Electrical Equipment'], ['water_heater_boiler', 'เครื่องทำน้ำร้อนหรือหม้อต้มน้ำ', 'Water Heater / Boiler Work'], ['flammable_storage', 'การเก็บวัตถุไวไฟหรือถังแก๊ส', 'Flammable Material / Gas Storage'], ['flammable_chemical_gas_use', 'การใช้สารเคมีหรือก๊าซที่ติดไฟง่าย', 'Use of Flammable Chemicals or Gases']
+      ]},
+      { code: 'PSYCHOSOCIAL', icon: 'assets/category-icons/psychosocial.png', th: 'สิ่งคุกคามทางจิตวิทยาสังคม', en: 'Psychosocial Hazards', hazards: [
+        ['work_stress', 'ความเครียดจากการทำงาน', 'Work Stress'], ['patient_relative_violence', 'ความรุนแรงจากผู้ป่วยหรือญาติ', 'Violence from Patients or Relatives'], ['coworker_violence', 'ความรุนแรงจากเพื่อนร่วมงาน', 'Coworker Violence'], ['insufficient_rest', 'พักผ่อนไม่เพียงพอ', 'Insufficient Rest']
+      ]},
+      { code: 'INDOOR_AIR_QUALITY', icon: 'assets/category-icons/indoor-air.png', th: 'คุณภาพอากาศภายในอาคาร', en: 'Indoor Air Quality Hazards', hazards: [
+        ['crowded_stuffy', 'มีความรู้สึกแออัดหรืออึดอัด', 'Crowded / Stuffy Conditions'], ['extreme_temperature', 'อากาศร้อนหรือเย็นเกินไป', 'Excessively Hot or Cold Air'], ['chemical_odor', 'มีกลิ่นฉุนของสารเคมี', 'Pungent Chemical Odor'], ['poor_ventilation', 'ระบบระบายอากาศไม่ดี', 'Poor Ventilation'], ['dust', 'มีฝุ่น', 'Dust'], ['dark_damp', 'อับทึบหรือชื้น', 'Dark / Damp Conditions'], ['surface_mold', 'พบเชื้อราตามพื้นผิว', 'Surface Mold']
+      ]}
+    ];
+
+    const state = {
+      checklist: {},
+      hazards: {},
+      customHazards: {},
+      steps: [{ work: '', hazards: '', duration: '', staff: '' }]
+    };
+
+    const checklistEl = document.getElementById('checklist');
+    const stepListEl = document.getElementById('stepList');
+    const categoryListEl = document.getElementById('categoryList');
+    const summaryBodyEl = document.getElementById('summaryBody');
+    const toastEl = document.getElementById('toast');
+    const departmentEl = document.getElementById('department');
+    const departmentStatusEl = document.getElementById('departmentStatus');
+    const hospitalTitleEl = document.getElementById('hospitalTitle');
+    const hazardAttachmentAccept = 'image/*';
+    let restoredDepartmentId = '';
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
+    }
+
+    function showToast(message) {
+      toastEl.textContent = message;
+      toastEl.classList.add('visible');
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => toastEl.classList.remove('visible'), 2600);
+    }
+
+    function formatFileSize(sizeBytes) {
+      const bytes = Number(sizeBytes) || 0;
+      if (bytes < 1024) return `${bytes} B`;
+      if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(bytes < 10240 ? 1 : 0)} KB`;
+      return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+    }
+
+    function fileMetadata(file) {
+      return {
+        name: String(file.name || 'evidence-file').replace(/[\\/\u0000-\u001f]/g, '_').slice(0, 255),
+        mimeType: String(file.type || 'application/octet-stream').slice(0, 150),
+        sizeBytes: Number(file.size) || 0,
+        lastModified: Number(file.lastModified) || Date.now()
+      };
+    }
+
+    function attachmentMarkup(data, hazardLabel) {
+      const attachment = data.attachment || null;
+      return `<div class="hazard-evidence">
+        <div class="attachment-row">
+          <span class="attachment-label">รูปหลักฐาน <small>ไม่บังคับ</small></span>
+          <label class="attachment-picker">
+            <input class="hazard-attachment" type="file" accept="${hazardAttachmentAccept}" aria-label="แนบรูปหลักฐานสำหรับ ${escapeHtml(hazardLabel)}">
+            <span class="attachment-action">${attachment ? 'เปลี่ยนรูป' : 'แนบรูป'}</span>
+          </label>
+          <span class="attachment-selected" data-selected="${attachment ? 'true' : 'false'}" ${attachment ? '' : 'hidden'} aria-live="polite">
+            <strong class="attachment-file-name">${escapeHtml(attachment?.name || '')}</strong>
+            <small class="attachment-file-meta">${attachment ? escapeHtml(formatFileSize(attachment.sizeBytes)) : ''}</small>
+          </span>
+          <button class="attachment-remove" type="button" ${attachment ? '' : 'hidden'} aria-label="ลบรูปหลักฐาน">ลบ</button>
+        </div>
+      </div>`;
+    }
+
+    function refreshAttachmentControl(row, attachment) {
+      const selected = row.querySelector('.attachment-selected');
+      selected.dataset.selected = String(Boolean(attachment));
+      selected.hidden = !attachment;
+      selected.querySelector('.attachment-file-name').textContent = attachment?.name || '';
+      selected.querySelector('.attachment-file-meta').textContent = attachment ? formatFileSize(attachment.sizeBytes) : '';
+      row.querySelector('.attachment-action').textContent = attachment ? 'เปลี่ยนรูป' : 'แนบรูป';
+      row.querySelector('.attachment-remove').hidden = !attachment;
+    }
+
+    function renderChecklist() {
+      checklistEl.innerHTML = checklistItems.map((item, index) => {
+        const saved = state.checklist[item.key] || {};
+        const values = item.na ? [['YES', 'มี', 'yes'], ['NO', 'ไม่มี', 'no'], ['NOT_APPLICABLE', 'ไม่เกี่ยวข้อง', 'na']] : [['YES', 'มี', 'yes'], ['NO', 'ไม่มี', 'no']];
+        return `<div class="check-row" data-check-key="${item.key}">
+          <div class="check-copy"><strong>${index + 1}. ${item.th}</strong><small>${item.en}</small></div>
+          <div class="segmented" role="group" aria-label="${item.th}">
+            ${values.map(([value, label, className]) => `<button type="button" class="segment ${saved.status === value ? `selected ${className}` : ''}" data-value="${value}">${label}</button>`).join('')}
+          </div>
+          ${item.na ? `<div class="na-reason ${saved.status === 'NOT_APPLICABLE' ? 'visible' : ''}"><input value="${escapeHtml(saved.reason || '')}" placeholder="ระบุเหตุผลที่ไม่เกี่ยวข้อง"></div>` : ''}
+        </div>`;
+      }).join('');
+
+      checklistEl.querySelectorAll('.check-row').forEach(row => {
+        const key = row.dataset.checkKey;
+        row.querySelectorAll('.segment').forEach(button => button.addEventListener('click', () => {
+          state.checklist[key] = state.checklist[key] || {};
+          state.checklist[key].status = button.dataset.value;
+          row.querySelectorAll('.segment').forEach(item => item.className = 'segment');
+          const className = button.dataset.value === 'YES' ? 'yes' : button.dataset.value === 'NO' ? 'no' : 'na';
+          button.classList.add('selected', className);
+          const reason = row.querySelector('.na-reason');
+          if (reason) reason.classList.toggle('visible', button.dataset.value === 'NOT_APPLICABLE');
+          updateProgress();
+        }));
+        const reasonInput = row.querySelector('.na-reason input');
+        if (reasonInput) reasonInput.addEventListener('input', () => {
+          state.checklist[key] = state.checklist[key] || {};
+          state.checklist[key].reason = reasonInput.value;
+        });
+      });
+      updateProgress();
+    }
+
+    function renderSteps() {
+      stepListEl.innerHTML = state.steps.map((step, index) => `<div class="step-card" data-step-index="${index}">
+        <div class="step-number">${String(index + 1).padStart(2, '0')}</div>
+        <div class="step-main-fields">
+          <div class="mini-field step-work"><label>ขั้นตอนการทำงาน</label><textarea data-field="work" required>${escapeHtml(step.work)}</textarea></div>
+          <div class="mini-field step-hazards"><label>สิ่งคุกคามหลัก</label><textarea data-field="hazards" required>${escapeHtml(step.hazards)}</textarea></div>
+        </div>
+        <div class="step-meta-fields">
+          <div class="mini-field duration"><label>ระยะเวลา</label><input data-field="duration" value="${escapeHtml(step.duration)}" required></div>
+          <div class="mini-field staff"><label>จำนวนคน</label><input data-field="staff" type="number" min="1" value="${escapeHtml(step.staff)}" required></div>
+        </div>
+        <button class="icon-button remove" type="button" aria-label="ลบขั้นตอน" title="ลบขั้นตอน">×</button>
+      </div>`).join('');
+
+      stepListEl.querySelectorAll('.step-card').forEach(card => {
+        const index = Number(card.dataset.stepIndex);
+        card.querySelectorAll('[data-field]').forEach(input => input.addEventListener('input', () => {
+          state.steps[index][input.dataset.field] = input.type === 'number' ? Number(input.value) : input.value;
+          updateProgress();
+        }));
+        card.querySelector('.remove').addEventListener('click', () => {
+          if (state.steps.length === 1) return showToast('ต้องมีขั้นตอนการทำงานอย่างน้อย 1 รายการ');
+          state.steps.splice(index, 1);
+          renderSteps();
+          updateProgress();
+        });
+      });
+      document.getElementById('stepCount').textContent = `${state.steps.length} ขั้นตอน`;
+    }
+
+    function scoreFor(data) {
+      if (!data || !data.hasRisk || !data.a || !data.b) return null;
+      const score = Number(data.a) * Number(data.b);
+      return { score, level: score <= 2 ? 'low' : score <= 4 ? 'medium' : 'high', label: score <= 2 ? 'ต่ำ' : score <= 4 ? 'ปานกลาง' : 'สูง' };
+    }
+
+    function hazardRowMarkup(category, hazard, customId = null) {
+      const [key, th, en] = hazard;
+      const stateKey = customId || key;
+      const data = customId ? state.customHazards[stateKey] || {} : state.hazards[stateKey] || {};
+      const result = scoreFor(data);
+      const titleBlock = customId
+        ? `<div class="custom-title"><input class="custom-hazard-input" value="${escapeHtml(data.title || '')}" placeholder="ระบุชื่อสิ่งคุกคามอื่นในหมวดนี้"></div>`
+        : '';
+      return `<div class="hazard-row" data-category="${category.code}" data-hazard-key="${stateKey}" data-custom="${customId ? 'true' : 'false'}">
+        ${titleBlock}
+        <div class="hazard-head">
+          <div class="hazard-name"><strong>${customId ? 'สิ่งคุกคามอื่น' : th}</strong><small>${customId ? 'Other hazard' : en}</small></div>
+          <div class="risk-switch">
+            <button type="button" class="risk-choice present ${data.hasRisk === true ? 'selected' : ''}" data-risk="true">มีความเสี่ยง</button>
+            <button type="button" class="risk-choice absent ${data.hasRisk === false ? 'selected' : ''}" data-risk="false">ไม่มีความเสี่ยง</button>
+            ${customId ? '<button type="button" class="icon-button remove-custom" aria-label="ลบสิ่งคุกคาม">×</button>' : ''}
+          </div>
+        </div>
+        <div class="risk-fields ${data.hasRisk === true ? 'visible' : ''}">
+          <div class="mini-field field-staff"><label>บุคลากร (คน)</label><input class="hazard-staff" type="number" min="0" value="${escapeHtml(data.staff ?? '')}"></div>
+          <div class="mini-field field-clients"><label>ผู้รับบริการ (คน)</label><input class="hazard-clients" type="number" min="0" value="${escapeHtml(data.clients ?? '')}"></div>
+          <div class="mini-field field-exposure"><label>โอกาสรับสัมผัส A</label><div class="score-toggle" role="group" aria-label="โอกาสรับสัมผัส A">${[[1, 'น้อย'], [2, 'ปานกลาง'], [3, 'มาก']].map(([value, label]) => `<button type="button" class="score-option ${Number(data.a) === value ? 'selected' : ''}" data-score="a" data-value="${value}" aria-pressed="${Number(data.a) === value}"><strong>${value}</strong><span>${label}</span></button>`).join('')}</div></div>
+          <div class="mini-field field-severity"><label>ความรุนแรง B</label><div class="score-toggle" role="group" aria-label="ความรุนแรง B">${[[1, 'เล็กน้อย'], [2, 'ปานกลาง'], [3, 'ร้ายแรง']].map(([value, label]) => `<button type="button" class="score-option ${Number(data.b) === value ? 'selected' : ''}" data-score="b" data-value="${value}" aria-pressed="${Number(data.b) === value}"><strong>${value}</strong><span>${label}</span></button>`).join('')}</div></div>
+          <div class="mini-field field-controls"><label>วิธีควบคุมที่มีอยู่ <span class="required">*</span></label><textarea class="hazard-controls" placeholder="หากไม่มี ให้ระบุว่า ไม่มี">${escapeHtml(data.controls || '')}</textarea></div>
+          <div class="mini-field field-score"><label>ระดับความเสี่ยง C = A × B</label><div class="score-display ${result ? result.level : 'empty'}" aria-live="polite"><strong class="score-number">${result ? result.score : '—'}</strong><span class="risk-badge ${result ? result.level : 'empty'}">${result ? result.label : 'รอคะแนน'}</span></div>${attachmentMarkup(data, customId ? data.title || 'สิ่งคุกคามอื่น' : th)}</div>
+          <div class="mini-field field-recommendation recommendation ${result && result.score >= 3 ? 'visible' : ''}"><label>ข้อเสนอแนะของผู้ประเมิน <span class="required">*</span></label><textarea class="hazard-recommendation" placeholder="ระบุสิ่งที่ควรปรับปรุง">${escapeHtml(data.recommendation || '')}</textarea></div>
+        </div>
+      </div>`;
+    }
+
+    function renderCategories() {
+      const hasExistingCategories = categoryListEl.children.length > 0;
+      const openCategoryCodes = new Set(
+        Array.from(categoryListEl.querySelectorAll('.category[open]'), element => element.dataset.categoryCode)
+      );
+      categoryListEl.innerHTML = categories.map((category, index) => {
+        const customs = Object.entries(state.customHazards).filter(([, value]) => value.category === category.code);
+        const answered = category.hazards.filter(([key]) => typeof state.hazards[key]?.hasRisk === 'boolean').length;
+        const present = category.hazards.filter(([key]) => state.hazards[key]?.hasRisk === true).length + customs.filter(([, value]) => value.hasRisk).length;
+        const isOpen = hasExistingCategories ? openCategoryCodes.has(category.code) : index === 0;
+        return `<details class="category" data-category-code="${category.code}" ${isOpen ? 'open' : ''}>
+          <summary>
+            <span class="category-number">${String(index + 1).padStart(2, '0')}</span>
+            <img class="category-icon" src="${category.icon}" alt="" aria-hidden="true" loading="lazy" decoding="async">
+            <span class="category-title"><strong>${category.th}</strong><small>${category.en}</small></span>
+            <span class="category-status ${present > 0 ? 'has-risk' : answered === category.hazards.length ? 'complete' : ''}">${answered} / ${category.hazards.length} · พบ ${present}</span>
+            <span class="category-chevron">⌄</span>
+          </summary>
+          <div class="category-tools">
+            <button class="button ghost small mark-none" type="button">ไม่พบความเสี่ยงทั้งหมวด</button>
+            <button class="button small add-custom" type="button">＋ เพิ่มสิ่งคุกคามอื่น</button>
+          </div>
+          <div class="hazard-list">
+            ${category.hazards.map(hazard => hazardRowMarkup(category, hazard)).join('')}
+            ${customs.map(([id]) => hazardRowMarkup(category, ['OTHER', 'อื่นๆ', 'Other'], id)).join('')}
+          </div>
+        </details>`;
+      }).join('');
+
+      categoryListEl.querySelectorAll('.category').forEach(categoryEl => {
+        const categoryCode = categoryEl.dataset.categoryCode;
+        categoryEl.querySelector('.mark-none').addEventListener('click', () => {
+          const category = categories.find(item => item.code === categoryCode);
+          category.hazards.forEach(([key]) => state.hazards[key] = { hasRisk: false });
+          renderCategories();
+          updateAll();
+          showToast(`บันทึกว่าไม่พบความเสี่ยงในหมวด ${category.th}`);
+        });
+        categoryEl.querySelector('.add-custom').addEventListener('click', () => {
+          const id = `OTHER-${categoryCode}-${Date.now()}`;
+          state.customHazards[id] = { category: categoryCode, title: '', hasRisk: true };
+          renderCategories();
+          categoryListEl.querySelector(`[data-hazard-key="${id}"] .custom-hazard-input`)?.focus();
+          updateAll();
+        });
+      });
+
+      bindHazardRows();
+      updateAll();
+    }
+
+    function bindHazardRows() {
+      categoryListEl.querySelectorAll('.hazard-row').forEach(row => {
+        const key = row.dataset.hazardKey;
+        const isCustom = row.dataset.custom === 'true';
+        const store = isCustom ? state.customHazards : state.hazards;
+        store[key] = store[key] || {};
+        const data = store[key];
+
+        row.querySelectorAll('.risk-choice').forEach(button => button.addEventListener('click', () => {
+          data.hasRisk = button.dataset.risk === 'true';
+          if (!data.hasRisk) Object.keys(data).filter(prop => !['hasRisk', 'category', 'title'].includes(prop)).forEach(prop => delete data[prop]);
+          row.querySelectorAll('.risk-choice').forEach(choice => choice.classList.remove('selected'));
+          button.classList.add('selected');
+          row.querySelector('.risk-fields').classList.toggle('visible', data.hasRisk);
+          if (!data.hasRisk) {
+            row.querySelector('.hazard-attachment').value = '';
+            refreshAttachmentControl(row, null);
+          }
+          refreshHazardRow(row, data);
+          updateAll();
+        }));
+
+        const bindings = [
+          ['.hazard-staff', 'staff', true], ['.hazard-clients', 'clients', true],
+          ['.hazard-controls', 'controls', false], ['.hazard-recommendation', 'recommendation', false], ['.custom-hazard-input', 'title', false]
+        ];
+        bindings.forEach(([selector, property, numeric]) => {
+          const input = row.querySelector(selector);
+          if (!input) return;
+          input.addEventListener('input', () => {
+            data[property] = numeric && input.value !== '' ? Number(input.value) : input.value;
+            refreshHazardRow(row, data);
+            updateAll();
+          });
+        });
+
+        const attachmentInput = row.querySelector('.hazard-attachment');
+        attachmentInput.addEventListener('change', () => {
+          const file = attachmentInput.files?.[0];
+          if (!file) return;
+          if (!String(file.type || '').startsWith('image/')) {
+            attachmentInput.value = '';
+            showToast('กรุณาเลือกไฟล์รูปภาพเท่านั้น');
+            return;
+          }
+          data.attachment = fileMetadata(file);
+          refreshAttachmentControl(row, data.attachment);
+          updateAll();
+        });
+        row.querySelector('.attachment-remove').addEventListener('click', () => {
+          delete data.attachment;
+          attachmentInput.value = '';
+          refreshAttachmentControl(row, null);
+          updateAll();
+        });
+
+        row.querySelectorAll('.score-option').forEach(button => button.addEventListener('click', () => {
+          const property = button.dataset.score;
+          data[property] = Number(button.dataset.value);
+          row.querySelectorAll(`.score-option[data-score="${property}"]`).forEach(option => {
+            const selected = option === button;
+            option.classList.toggle('selected', selected);
+            option.setAttribute('aria-pressed', String(selected));
+          });
+          refreshHazardRow(row, data);
+          updateAll();
+        }));
+
+        row.querySelector('.remove-custom')?.addEventListener('click', () => {
+          delete state.customHazards[key];
+          renderCategories();
+        });
+      });
+    }
+
+    function refreshHazardRow(row, data) {
+      const result = scoreFor(data);
+      row.querySelector('.score-number').textContent = result ? result.score : '—';
+      row.querySelector('.score-display').className = `score-display ${result ? result.level : 'empty'}`;
+      const badge = row.querySelector('.risk-badge');
+      badge.className = `risk-badge ${result ? result.level : 'empty'}`;
+      badge.textContent = result ? result.label : 'รอคะแนน';
+      row.querySelector('.recommendation').classList.toggle('visible', Boolean(result && result.score >= 3));
+    }
+
+    function getRiskRows() {
+      const rows = [];
+      categories.forEach(category => category.hazards.forEach(([key, th, en]) => {
+        const data = state.hazards[key];
+        const result = scoreFor(data);
+        if (data?.hasRisk) rows.push({ category, key, th, en, data, result });
+      }));
+      Object.entries(state.customHazards).forEach(([key, data]) => {
+        if (!data.hasRisk) return;
+        const category = categories.find(item => item.code === data.category);
+        rows.push({ category, key, th: data.title || 'สิ่งคุกคามอื่น', en: 'Other hazard', data, result: scoreFor(data) });
+      });
+      return rows.sort((left, right) => (right.result?.score || 0) - (left.result?.score || 0));
+    }
+
+    function renderSummary() {
+      const rows = getRiskRows();
+      document.getElementById('summaryCount').textContent = `${rows.length} ความเสี่ยง`;
+      if (!rows.length) {
+        summaryBodyEl.innerHTML = '<div class="summary-empty"><strong>ยังไม่มีรายการความเสี่ยง</strong>เลือกว่า “มีความเสี่ยง” ในหมวดสิ่งคุกคาม แล้วผลสรุปจะปรากฏที่นี่</div>';
+        return;
+      }
+      summaryBodyEl.innerHTML = `<div class="summary-table-wrap"><table class="summary-table">
+        <thead><tr><th>สิ่งคุกคาม</th><th>A</th><th>B</th><th>C</th><th>ระดับ</th><th>ผู้สัมผัส</th><th>วิธีควบคุม / ข้อเสนอแนะ</th></tr></thead>
+        <tbody>${rows.map(row => `<tr>
+          <td><strong>${escapeHtml(row.th)}</strong><br><span>${escapeHtml(row.category.th)}</span></td>
+          <td>${row.data.a || '—'}</td><td>${row.data.b || '—'}</td><td><strong>${row.result?.score || '—'}</strong></td>
+          <td><span class="risk-badge ${row.result?.level || 'empty'}">${row.result?.label || 'ไม่ครบ'}</span></td>
+          <td>บุคลากร ${row.data.staff ?? '—'}<br>ผู้รับบริการ ${row.data.clients ?? '—'}</td>
+          <td>${escapeHtml(row.data.controls || 'ยังไม่ระบุ')}${row.data.recommendation ? `<br><strong>แนะนำ:</strong> ${escapeHtml(row.data.recommendation)}` : ''}</td>
+        </tr>`).join('')}</tbody>
+      </table></div>`;
+    }
+
+    function updateProgress() {
+      const headerComplete = Number(Boolean(document.getElementById('assessmentDate').value)) + Number(Boolean(departmentEl.value)) + Number(Number(document.getElementById('staffTotal').value) > 0);
+      const checklistComplete = checklistItems.filter(item => Boolean(state.checklist[item.key]?.status)).length;
+      const validSteps = state.steps.filter(step => step.work && step.hazards && step.duration && Number(step.staff) > 0).length;
+      const hazardTotal = categories.reduce((sum, category) => sum + category.hazards.length, 0);
+      const hazardsComplete = categories.reduce((sum, category) => sum + category.hazards.filter(([key]) => typeof state.hazards[key]?.hasRisk === 'boolean').length, 0);
+      const completed = headerComplete + checklistComplete + validSteps + hazardsComplete;
+      const total = 3 + checklistItems.length + state.steps.length + hazardTotal;
+      const progress = Math.round((completed / total) * 100);
+      document.getElementById('progressValue').textContent = `${progress}%`;
+      const footerProgress = document.getElementById('footerProgress');
+      const progressCells = [...footerProgress.querySelectorAll('.progress-segment')];
+      const chargedCells = Math.round((progress / 100) * progressCells.length);
+      footerProgress.setAttribute('aria-valuenow', String(progress));
+      progressCells.forEach((cell, index) => cell.classList.toggle('active', index < chargedCells));
+      document.getElementById('checklistCount').textContent = `${checklistComplete} / ${checklistItems.length} รายการ`;
+      document.getElementById('hazardCount').textContent = `${hazardsComplete} / ${hazardTotal} รายการ`;
+    }
+
+    function updateAll() {
+      updateProgress();
+      renderSummary();
+      categoryListEl.querySelectorAll('.category').forEach(categoryEl => {
+        const category = categories.find(item => item.code === categoryEl.dataset.categoryCode);
+        const answered = category.hazards.filter(([key]) => typeof state.hazards[key]?.hasRisk === 'boolean').length;
+        const present = category.hazards.filter(([key]) => state.hazards[key]?.hasRisk === true).length + Object.values(state.customHazards).filter(item => item.category === category.code && item.hasRisk).length;
+        const status = categoryEl.querySelector('.category-status');
+        status.textContent = `${answered} / ${category.hazards.length} · พบ ${present}`;
+        status.classList.toggle('complete', present === 0 && answered === category.hazards.length);
+        status.classList.toggle('has-risk', present > 0);
+      });
+    }
+
+    function saveDraft() {
+      const draft = {
+        state,
+        header: {
+          departmentId: departmentEl.value,
+          evaluatorName: document.getElementById('evaluator').value,
+          staffTotal: document.getElementById('staffTotal').value,
+          additionalEvaluators: document.getElementById('additionalEvaluators').value
+        },
+        savedAt: new Date().toISOString()
+      };
+      sessionStorage.setItem('rah01:preview:draft:1.1.0', JSON.stringify(draft));
+      const time = new Intl.DateTimeFormat('th-TH', { hour: '2-digit', minute: '2-digit' }).format(new Date());
+      document.getElementById('saveStateText').textContent = `บันทึกล่าสุด ${time} น.`;
+      showToast('บันทึกแบบร่างในเซสชันนี้แล้ว');
+    }
+
+    function restoreDraft() {
+      const rawDraft = sessionStorage.getItem('rah01:preview:draft:1.1.0');
+      if (!rawDraft) return;
+      try {
+        const draft = JSON.parse(rawDraft);
+        if (!draft.state || !Array.isArray(draft.state.steps)) throw new Error('Invalid draft');
+        state.checklist = draft.state.checklist || {};
+        state.hazards = draft.state.hazards || {};
+        state.customHazards = draft.state.customHazards || {};
+        state.steps = draft.state.steps;
+        restoredDepartmentId = String(draft.header?.departmentId || '');
+        document.getElementById('evaluator').value = draft.header?.evaluatorName || document.getElementById('evaluator').value;
+        document.getElementById('staffTotal').value = draft.header?.staffTotal || document.getElementById('staffTotal').value;
+        document.getElementById('additionalEvaluators').value = draft.header?.additionalEvaluators || '';
+        const savedTime = draft.savedAt ? new Date(draft.savedAt) : null;
+        document.getElementById('saveStateText').textContent = savedTime && !Number.isNaN(savedTime.getTime())
+          ? `เรียกคืนแบบร่างที่บันทึก ${new Intl.DateTimeFormat('th-TH', { hour: '2-digit', minute: '2-digit' }).format(savedTime)} น.`
+          : 'เรียกคืนแบบร่างจากเซสชันนี้แล้ว';
+      } catch (error) {
+        sessionStorage.removeItem('rah01:preview:draft:1.1.0');
+      }
+    }
+
+    function setSmartAssessmentDate() {
+      const input = document.getElementById('assessmentDate');
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      input.value = `${year}-${month}-${day}`;
+    }
+
+    function focusValidationTarget(target) {
+      if (!target) return;
+      document.querySelectorAll('.validation-focus').forEach(element => element.classList.remove('validation-focus'));
+      const category = target.closest('details.category');
+      if (category) category.open = true;
+      target.classList.add('validation-focus');
+      target.focus({ preventScroll: true });
+      const previousScrollBehavior = document.documentElement.style.scrollBehavior;
+      document.documentElement.style.scrollBehavior = 'auto';
+      target.scrollIntoView({ block: 'center', inline: 'nearest' });
+      document.documentElement.style.scrollBehavior = previousScrollBehavior;
+      const clearHighlight = () => target.classList.remove('validation-focus');
+      target.addEventListener('input', clearHighlight, { once: true });
+      target.addEventListener('click', clearHighlight, { once: true });
+    }
+
+    function rejectReview(target, message) {
+      focusValidationTarget(target);
+      showToast(message);
+      return false;
+    }
+
+    function validateForReview() {
+      const assessmentDate = document.getElementById('assessmentDate');
+      const staffTotal = document.getElementById('staffTotal');
+      if (!assessmentDate.value) return rejectReview(assessmentDate, 'กรุณาระบุวันที่ทำการประเมิน');
+      if (!departmentEl.value || !window.RAHDepartmentService.getDepartment(departmentEl.value)) return rejectReview(departmentEl, 'กรุณาเลือกแผนกจากรายการที่ผู้ดูแลกำหนด');
+      if (!(Number(staffTotal.value) > 0)) return rejectReview(staffTotal, 'กรุณาระบุจำนวนผู้ปฏิบัติงานทั้งหมด');
+
+      const firstMissingChecklist = checklistItems.find(item => !state.checklist[item.key]?.status);
+      if (firstMissingChecklist) {
+        const missingCount = checklistItems.filter(item => !state.checklist[item.key]?.status).length;
+        const target = document.querySelector(`[data-check-key="${firstMissingChecklist.key}"] .segment`);
+        return rejectReview(target, `ยังตอบระบบอาชีวอนามัยไม่ครบ ${missingCount} รายการ`);
+      }
+
+      const invalidStepIndex = state.steps.findIndex(step => !step.work || !step.hazards || !step.duration || !(Number(step.staff) > 0));
+      if (invalidStepIndex >= 0) {
+        const step = state.steps[invalidStepIndex];
+        const field = !step.work ? 'work' : !step.hazards ? 'hazards' : !step.duration ? 'duration' : 'staff';
+        const target = stepListEl.querySelector(`[data-step-index="${invalidStepIndex}"] [data-field="${field}"]`);
+        return rejectReview(target, `กรุณากรอกข้อมูลขั้นตอนการทำงานที่ ${invalidStepIndex + 1} ให้ครบ`);
+      }
+
+      const firstUnansweredHazard = categories.flatMap(category => category.hazards).find(([key]) => typeof state.hazards[key]?.hasRisk !== 'boolean');
+      if (firstUnansweredHazard) {
+        const unansweredCount = categories.reduce((count, category) => count + category.hazards.filter(([key]) => typeof state.hazards[key]?.hasRisk !== 'boolean').length, 0);
+        const row = document.querySelector(`[data-hazard-key="${firstUnansweredHazard[0]}"]`);
+        return rejectReview(row?.querySelector('.risk-choice.present'), `ยังประเมินสิ่งคุกคามไม่ครบ ${unansweredCount} รายการ`);
+      }
+
+      const invalidRisk = getRiskRows().find(row => !row.data.a || !row.data.b || row.data.staff === undefined || row.data.clients === undefined || !String(row.data.controls || '').trim() || (row.result?.score >= 3 && !String(row.data.recommendation || '').trim()));
+      if (invalidRisk) {
+        const row = document.querySelector(`[data-hazard-key="${invalidRisk.key}"]`);
+        let target;
+        let fieldLabel;
+        if (!invalidRisk.data.a) {
+          target = row?.querySelector('.score-option[data-score="a"]');
+          fieldLabel = 'โอกาสรับสัมผัส A';
+        } else if (!invalidRisk.data.b) {
+          target = row?.querySelector('.score-option[data-score="b"]');
+          fieldLabel = 'ความรุนแรง B';
+        } else if (invalidRisk.data.staff === undefined) {
+          target = row?.querySelector('.hazard-staff');
+          fieldLabel = 'จำนวนบุคลากร';
+        } else if (invalidRisk.data.clients === undefined) {
+          target = row?.querySelector('.hazard-clients');
+          fieldLabel = 'จำนวนผู้รับบริการ';
+        } else if (!String(invalidRisk.data.controls || '').trim()) {
+          target = row?.querySelector('.hazard-controls');
+          fieldLabel = 'วิธีควบคุมที่มีอยู่';
+        } else {
+          target = row?.querySelector('.hazard-recommendation');
+          fieldLabel = 'ข้อเสนอแนะของผู้ประเมิน';
+        }
+        return rejectReview(target, `กรุณาระบุ${fieldLabel}สำหรับ ${invalidRisk.th}`);
+      }
+
+      const payload = buildSubmissionPayload();
+      sessionStorage.setItem('rah01:preview:review:1.1.0', JSON.stringify(payload));
+      window.dispatchEvent(new CustomEvent('rah01:ready-for-review', { detail: payload }));
+      showToast('ข้อมูลครบ พร้อมเข้าสู่หน้ายืนยันการส่ง');
+      return true;
+    }
+
+    function buildSubmissionPayload() {
+      const department = window.RAHDepartmentService.getDepartment(departmentEl.value);
+      if (!department) throw new Error('A current Settings department is required.');
+      return {
+        schemaVersion: 'rah01-submission.v1',
+        formVersion: '1.1.0',
+        header: {
+          assessmentDate: document.getElementById('assessmentDate').value,
+          departmentId: department.id,
+          departmentSnapshot: { code: department.code, nameTh: department.nameTh, nameEn: department.nameEn },
+          evaluatorName: document.getElementById('evaluator').value.trim(),
+          totalStaffCount: Number(document.getElementById('staffTotal').value),
+          additionalEvaluators: document.getElementById('additionalEvaluators').value.trim()
+        },
+        checklist: checklistItems.map(item => ({
+          itemKey: item.key,
+          status: state.checklist[item.key]?.status || null,
+          notApplicableReason: state.checklist[item.key]?.status === 'NOT_APPLICABLE' ? String(state.checklist[item.key]?.reason || '').trim() : null
+        })),
+        workSteps: state.steps.map((step, index) => ({
+          order: index + 1,
+          workStep: String(step.work || '').trim(),
+          primaryHazards: String(step.hazards || '').trim(),
+          workDuration: String(step.duration || '').trim(),
+          staffInvolvedCount: Number(step.staff)
+        })),
+        hazardEvaluations: getRiskRows().map(row => ({
+          categoryCode: row.category.code,
+          hazardKey: row.custom ? 'OTHER' : row.key,
+          customTitle: row.custom ? String(row.data.title || '').trim() : null,
+          hasRisk: true,
+          exposedStaffCount: Number(row.data.staff),
+          exposedClientCount: Number(row.data.clients),
+          exposureScoreA: Number(row.data.a),
+          severityScoreB: Number(row.data.b),
+          existingControls: String(row.data.controls || '').trim(),
+          recommendation: String(row.data.recommendation || '').trim(),
+          evidenceAttachment: row.data.attachment ? {
+            name: row.data.attachment.name,
+            mimeType: row.data.attachment.mimeType,
+            sizeBytes: Number(row.data.attachment.sizeBytes) || 0,
+            lastModified: Number(row.data.attachment.lastModified) || 0
+          } : null
+        }))
+      };
+    }
+
+    async function loadDepartments() {
+      try {
+        const config = await window.RAHDepartmentService.loadFormConfig();
+        hospitalTitleEl.textContent = `RAH.01 · ${config.hospitalName}`;
+        document.title = `RAH.01 — ${config.hospitalName}`;
+        departmentEl.innerHTML = '<option value="">เลือกแผนก</option>' + config.departments.map(department => `<option value="${escapeHtml(department.id)}">${escapeHtml(department.nameTh)}${department.nameEn ? ` · ${escapeHtml(department.nameEn)}` : ''}</option>`).join('');
+        if (restoredDepartmentId && config.departments.some(department => department.id === restoredDepartmentId)) departmentEl.value = restoredDepartmentId;
+        departmentStatusEl.textContent = config.departments.length ? `พร้อมใช้งาน ${config.departments.length} แผนก` : 'ยังไม่มีแผนกที่เปิดใช้งานใน Settings';
+      } catch (error) {
+        departmentEl.innerHTML = '<option value="">โหลดรายการแผนกไม่สำเร็จ</option>';
+        departmentStatusEl.textContent = 'ติดต่อผู้ดูแลระบบเพื่อตรวจสอบ Settings';
+        showToast('โหลดรายการแผนกไม่สำเร็จ');
+      }
+      updateProgress();
+    }
+
+    document.getElementById('addStepButton').addEventListener('click', () => {
+      state.steps.push({ work: '', hazards: '', duration: '', staff: '' });
+      renderSteps();
+      updateProgress();
+      stepListEl.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+
+    ['assessmentDate', 'staffTotal', 'evaluator', 'additionalEvaluators'].forEach(id => document.getElementById(id).addEventListener('input', updateProgress));
+    departmentEl.addEventListener('change', updateProgress);
+
+    const mobileDrawer = document.getElementById('mobileDrawer');
+    const menuToggle = document.getElementById('menuToggle');
+    const drawerClose = document.getElementById('drawerClose');
+    const drawerBackdrop = document.getElementById('drawerBackdrop');
+    const editorDrawer = window.RAHShell.createDrawer({
+      drawer: mobileDrawer,
+      trigger: menuToggle,
+      scrim: drawerBackdrop,
+      closeButton: drawerClose,
+      openClassTarget: document.body,
+      openClass: 'drawer-open',
+      focusTarget: drawerClose
+    });
+    const setDrawer = (open, restoreFocus = true) => open ? editorDrawer.open() : editorDrawer.close(restoreFocus);
+
+    document.querySelectorAll('.nav-item').forEach(button => button.addEventListener('click', () => {
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+      button.classList.add('active');
+      setDrawer(false, false);
+      document.getElementById(button.dataset.target)?.scrollIntoView({ behavior: 'smooth' });
+    }));
+    document.getElementById('printButton').addEventListener('click', () => window.print());
+    document.getElementById('saveBottomButton').addEventListener('click', saveDraft);
+    document.getElementById('reviewButton').addEventListener('click', validateForReview);
+
+    let printOpenState = [];
+    window.addEventListener('beforeprint', () => {
+      printOpenState = Array.from(document.querySelectorAll('details.category')).map(details => details.open);
+      document.querySelectorAll('details.category').forEach(details => details.open = true);
+    });
+    window.addEventListener('afterprint', () => {
+      document.querySelectorAll('details.category').forEach((details, index) => details.open = printOpenState[index] ?? details.open);
+    });
+
+    setSmartAssessmentDate();
+    restoreDraft();
+    loadDepartments();
+    renderChecklist();
+    renderSteps();
+    renderCategories();
+    window.__rah01Form = Object.freeze({ buildSubmissionPayload, validateForReview });
+  </script>
+</body>
+</html>
