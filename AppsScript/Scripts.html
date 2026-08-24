@@ -60,7 +60,6 @@
   window.RAHShell = Object.freeze({ createDrawer, bindPopovers });
 })();
 
-
 (function () {
   'use strict';
 
@@ -617,8 +616,10 @@
         state.customHazards = draft.state.customHazards || {};
         state.steps = draft.state.steps;
         restoredDepartmentId = String(draft.header?.departmentId || '');
-        document.getElementById('evaluator').value = draft.header?.evaluatorName || document.getElementById('evaluator').value;
-        document.getElementById('staffTotal').value = draft.header?.staffTotal || document.getElementById('staffTotal').value;
+        const isLegacyDemoHeader = draft.header?.evaluatorName === 'นางทดลอง ทดสอบ'
+          && String(draft.header?.staffTotal || '') === '34';
+        document.getElementById('evaluator').value = isLegacyDemoHeader ? '' : String(draft.header?.evaluatorName || '');
+        document.getElementById('staffTotal').value = isLegacyDemoHeader ? '' : String(draft.header?.staffTotal || '');
         document.getElementById('additionalEvaluators').value = draft.header?.additionalEvaluators || '';
         const savedTime = draft.savedAt ? new Date(draft.savedAt) : null;
         document.getElementById('saveStateText').textContent = savedTime && !Number.isNaN(savedTime.getTime())
@@ -811,12 +812,44 @@
     });
     const setDrawer = (open, restoreFocus = true) => open ? editorDrawer.open() : editorDrawer.close(restoreFocus);
 
-    document.querySelectorAll('.nav-item').forEach(button => button.addEventListener('click', () => {
-      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-      button.classList.add('active');
+    const navItems = Array.from(document.querySelectorAll('.nav-item'));
+    const trackedSections = navItems.map(button => ({ button, section: document.getElementById(button.dataset.target) })).filter(item => item.section);
+    let scrollSpyFrame = 0;
+
+    function setActiveSection(sectionId) {
+      navItems.forEach(item => {
+        const active = item.dataset.target === sectionId;
+        item.classList.toggle('active', active);
+        if (active) item.setAttribute('aria-current', 'step');
+        else item.removeAttribute('aria-current');
+      });
+    }
+
+    function syncActiveSection() {
+      scrollSpyFrame = 0;
+      if (!trackedSections.length) return;
+      const readingLine = Math.max(96, Math.min(window.innerHeight * .32, 280));
+      let current = trackedSections[0];
+      for (const item of trackedSections) {
+        if (item.section.getBoundingClientRect().top <= readingLine) current = item;
+        else break;
+      }
+      if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 4) current = trackedSections[trackedSections.length - 1];
+      setActiveSection(current.section.id);
+    }
+
+    function scheduleScrollSpy() {
+      if (!scrollSpyFrame) scrollSpyFrame = window.requestAnimationFrame(syncActiveSection);
+    }
+
+    navItems.forEach(button => button.addEventListener('click', () => {
+      setActiveSection(button.dataset.target);
       setDrawer(false, false);
       document.getElementById(button.dataset.target)?.scrollIntoView({ behavior: 'smooth' });
     }));
+    window.addEventListener('scroll', scheduleScrollSpy, { passive: true });
+    window.addEventListener('resize', scheduleScrollSpy);
+    scheduleScrollSpy();
     document.getElementById('printButton').addEventListener('click', () => window.print());
     document.getElementById('saveBottomButton').addEventListener('click', saveDraft);
     document.getElementById('reviewButton').addEventListener('click', validateForReview);

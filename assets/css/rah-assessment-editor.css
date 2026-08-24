@@ -1527,6 +1527,7 @@ body::before { display: none; }
   padding: 11px;
   border: 2px dashed transparent;
   border-radius: 12px;
+  transition: background-color .2s ease, border-color .2s ease, transform .2s ease;
 }
 .nav-item:hover { border-color: transparent; background: var(--paper-2); }
 .nav-item.active { border: 2px dashed var(--ink); background: var(--green); }
@@ -1540,6 +1541,9 @@ body::before { display: none; }
   font: 700 var(--text-label) var(--font-mono);
 }
 .nav-item.active .nav-index { border-color: var(--ink); color: var(--ink); background: var(--yellow); }
+@media (prefers-reduced-motion: reduce) {
+  .nav-item { transition: none; }
+}
 .nav-copy strong { color: var(--ink); font-size: var(--text-label); }
 .nav-copy small { color: var(--ink-soft); font-size: var(--text-caption); }
 .rail-note {
