@@ -219,7 +219,6 @@ function validateSubmission_(payload, attachmentTransports) {
     var b = integerInRange_(hazard.severityScoreB, 'Severity score B', 1, 3);
     var score = a * b;
     var recommendation = boundedText_(hazard.recommendation, 'Recommendation', 5000);
-    if (score >= 3 && !recommendation) throw new Error('Recommendation is required for score 3 or higher.');
     var attachment = hazard.evidenceAttachment || null;
     var transport = attachmentTransports[index] || null;
     if (attachment) {
@@ -255,7 +254,7 @@ function validateSubmission_(payload, attachmentTransports) {
     department: department,
     header: {
       assessmentDate: new Date(dateText + 'T00:00:00Z'),
-      evaluatorName: boundedText_(header.evaluatorName, 'Evaluator name', 500),
+      evaluatorName: requiredText_(boundedText_(header.evaluatorName, 'Evaluator name', 500), 'Evaluator name'),
       additionalEvaluators: boundedText_(header.additionalEvaluators, 'Additional evaluators', 2000),
       totalStaffCount: positiveInteger_(header.totalStaffCount, 'Total staff count')
     },

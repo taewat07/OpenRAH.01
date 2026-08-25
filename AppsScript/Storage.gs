@@ -124,7 +124,7 @@ function refreshRah01Dashboard_() {
   dashboard.getRange(RAH01_DASHBOARD_FIRST_REVIEW_ROW, 1, reviewCapacity, 9).setValues(indexRows.map(function (row) { return row.map(safeCellValue_); }));
   dashboard.getRange(RAH01_DASHBOARD_FIRST_REVIEW_ROW, 20, reviewCapacity, 1).setValues(Array.from({ length: reviewCapacity }, function (_, index) { return [safeCellValue_(sorted[index] ? sorted[index].assessment_id : '')]; }));
 
-  var categoryCodes = ['PHYSICAL', 'BIOLOGICAL', 'CHEMICAL', 'ERGONOMIC', 'SAFETY_ACCIDENT', 'FIRE_DISASTER', 'PSYCHOSOCIAL', 'INDOOR_AIR_QUALITY'];
+  var categoryCodes = ['PHYSICAL', 'BIOLOGICAL', 'CHEMICAL', 'ERGONOMIC', 'PSYCHOSOCIAL', 'SAFETY_ACCIDENT', 'FIRE_DISASTER', 'INDOOR_AIR_QUALITY'];
   dashboard.getRange('O4:O11').setValues(categoryCodes.map(function (code) { return [hazards.filter(function (row) { return row.category_code === code && asBoolean_(row.has_risk); }).length]; }));
   var top = assessments.slice().sort(function (left, right) { return Number(right.overall_risk_score) - Number(left.overall_risk_score) || String(left.department_name).localeCompare(String(right.department_name)); }).slice(0, 4);
   dashboard.getRange('Q4:R7').setValues(Array.from({ length: 4 }, function (_, index) {

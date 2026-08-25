@@ -400,6 +400,7 @@
     select:disabled { cursor: wait; color: var(--ink-soft); background: var(--paper); }
     input[readonly] { color: var(--ink-soft); background: var(--paper); }
     .field-status { display: block; min-height: 1.2em; margin-top: 6px; color: var(--ink-faint); font-size: .62rem; }
+    .field-status[hidden] { display: none; }
     .required { color: var(--coral-dark); }
 
     .checklist { display: grid; gap: 10px; }
@@ -519,6 +520,7 @@
 
     .category-tools { display: flex; justify-content: flex-end; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--line); background: var(--surface); }
     .hazard-list { padding: 0 14px 14px; }
+    .category-footer { display: flex; justify-content: flex-end; padding: 12px 18px 16px; border-top: 1px solid var(--line); background: var(--surface); }
 
     .hazard-row { border-bottom: 1px solid var(--line); }
     .hazard-row:last-child { border-bottom: 0; }
@@ -556,9 +558,6 @@
     .risk-fields .field-severity { grid-column: span 4; }
     .risk-fields .field-score { grid-column: span 4; align-self: start; }
     .risk-fields .field-controls { grid-column: span 8; }
-    .risk-fields .field-recommendation { grid-column: 1 / -1; }
-    .risk-fields .recommendation { display: none; }
-    .risk-fields .recommendation.visible { display: block; }
     .risk-fields .mini-field label {
       display: block;
       margin-bottom: 6px;
@@ -654,6 +653,15 @@
       font-size: .66rem;
       font-weight: 900;
       cursor: pointer;
+    }
+
+    .attachment-icon {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
     .attachment-picker:focus-within .attachment-action { box-shadow: 0 0 0 3px rgba(255, 233, 92, .72); }
@@ -818,7 +826,6 @@
       .risk-fields .field-severity,
       .risk-fields .field-score,
       .risk-fields .field-controls { grid-column: span 6; }
-      .risk-fields .field-recommendation { grid-column: 1 / -1; }
       .sticky-submit { left: 0; padding: 10px 12px; }
       .sticky-submit { grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
       .footer-progress { grid-template-columns: auto minmax(0, 1fr); max-width: none; padding-right: 7px; }
@@ -974,14 +981,14 @@
 
     .step-meta-fields {
       grid-area: meta;
-      display: flex;
-      justify-content: flex-end;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 108px;
       gap: 10px;
       padding-top: 1px;
     }
 
-    .step-meta-fields .mini-field { width: 132px; }
-    .step-meta-fields .staff { width: 96px; }
+    .step-meta-fields .mini-field,
+    .step-meta-fields .staff { width: auto; }
     .step-card .remove { grid-area: remove; align-self: start; }
 
     .step-card .mini-field label {
@@ -1014,6 +1021,7 @@
     .category-status { border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); }
     .category-tools { padding: 9px 6px; background: var(--surface); }
     .hazard-list { padding: 0 6px; background: var(--surface); }
+    .category-footer { padding: 12px 6px 16px; background: var(--surface); }
     .risk-choice { border-radius: var(--radius-sm); }
     .score-display { border-radius: var(--radius-sm); }
     .risk-badge { border-radius: 999px; }
@@ -1162,7 +1170,7 @@
       .step-card .step-number { grid-area: number; grid-column: auto; grid-row: auto; margin-top: 21px; }
       .step-card .remove { grid-area: remove; grid-column: auto; grid-row: auto; }
       .step-main-fields { grid-template-columns: 1fr; gap: 10px; }
-      .step-meta-fields { display: grid; grid-template-columns: 1fr 1fr; justify-content: stretch; gap: 10px; }
+      .step-meta-fields { grid-template-columns: minmax(0, 1fr) 96px; gap: 10px; }
       .step-card .step-main-fields .mini-field,
       .step-card .step-meta-fields .mini-field { grid-column: auto; }
       .step-meta-fields .mini-field,
@@ -1308,6 +1316,7 @@
     .category-status.has-risk { border-color: var(--coral); color: var(--ink); background: var(--coral); }
     .category-tools, .hazard-row { border-bottom: var(--section-divider); }
     .category-tools { background: var(--surface); }
+    .category-footer { border-top: var(--section-divider); }
     .risk-choice { border-color: var(--ink); border-radius: 6px; color: var(--ink); background: transparent; }
     .risk-choice:hover { background: var(--lime-soft); }
     .risk-choice.selected.present { border-color: var(--ink); color: var(--ink); background: var(--lime); }
@@ -1320,7 +1329,7 @@
     .score-option[data-value="3"].selected { border-color: var(--coral); color: var(--ink); background: var(--coral); }
     .score-display { border-style: solid; border-color: var(--line-strong); background: var(--paper); }
     .score-display.low { border-color: var(--green); color: var(--ink); background: var(--green-soft); }
-    .score-display.medium { border-color: var(--amber); color: var(--ink); background: var(--amber-soft); }
+    .score-display.medium { border-color: transparent; color: var(--ink); background: var(--amber-soft); }
     .score-display.high { border-color: var(--coral); color: var(--ink); background: var(--coral-soft); }
     .score-display.low,
     .score-display.medium,
@@ -1461,7 +1470,7 @@
     @media print {
       .section-heading::after { display: none; }
       body { background: var(--white); }
-      body::before, .rail, .topbar, .sticky-submit, .category-tools, .risk-switch, .icon-button, .add-row, .toast, .drawer-backdrop { display: none !important; }
+      body::before, .rail, .topbar, .sticky-submit, .category-tools, .category-footer, .risk-switch, .icon-button, .add-row, .toast, .drawer-backdrop { display: none !important; }
       .app-shell { display: block; }
       .content { width: 100%; padding: 0; }
       .hero { margin: 0 0 12px; padding: 20px; border-radius: 0; color: var(--ink); background: var(--white); box-shadow: none; }
@@ -1565,6 +1574,7 @@ body::before { display: none; }
 .content { width: min(var(--content-max), calc(100% - 64px)); padding-top: 38px; }
 .hero h1 { font-family: var(--font-display); font-size: var(--text-page); line-height: 1.02; letter-spacing: 0; }
 .hero p { font-size: var(--text-body); }
+#hospitalTitle { font-size: calc(var(--text-body) * 1.5); }
 .button { min-height: 46px; border-radius: var(--radius-md); font-size: var(--text-label); }
 .icon-action, .menu-toggle, .drawer-close { width: 46px; height: 46px; min-height: 46px; }
 .field > label, .mini-field > label { font-size: var(--text-label); }
@@ -1578,6 +1588,26 @@ input, select, textarea { min-height: 46px; border-radius: var(--radius-md); fon
 /* Selection fills are intentionally pale; keep both hazard toggle labels legible. */
 .risk-choice.selected.present,
 .risk-choice.selected.absent { color: var(--ink); }
+
+/* Hazard status uses the same segmented control language as the OH checklist. */
+.risk-switch.segmented {
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+.risk-switch.segmented .risk-choice {
+  min-width: 96px;
+  padding: 7px 9px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--ink-soft);
+  background: transparent;
+}
+.risk-switch.segmented .risk-choice:hover { color: var(--ink); background: var(--paper-deep); }
+.risk-switch.segmented .risk-choice.selected.present { color: var(--ink); background: var(--coral-soft); }
+.risk-switch.segmented .risk-choice.selected.absent { color: var(--ink); background: var(--mint); }
 
 /* Keep summary badges readable even if generic badge styles change later. */
 .summary-table .risk-badge.low { color: var(--ink); background: var(--green); }
@@ -1608,6 +1638,18 @@ input, select, textarea { min-height: 46px; border-radius: var(--radius-md); fon
   .topbar .icon-action { width: 44px; height: 44px; min-height: 44px; }
   .content { width: min(var(--content-max), calc(100% - 36px)); padding-top: 24px; }
   .sticky-submit { left: 0; }
+
+  .mobile-menu-fab {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    left: auto;
+    z-index: 45;
+    display: grid;
+    border-color: var(--ink);
+    background: var(--lime);
+    box-shadow: var(--shadow-soft);
+  }
 }
 
 @media print {

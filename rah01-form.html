@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@10..48,75..100,700;800&family=IBM+Plex+Mono:wght@600;700&family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <title>RAH.01 — แบบประเมินความเสี่ยงทางสุขภาพ</title>
   <link rel="stylesheet" href="assets/css/rah-design-system.css?v=20260825-5">
-  <link rel="stylesheet" href="assets/css/rah-assessment-editor.css?v=20260825-5">
+  <link rel="stylesheet" href="assets/css/rah-assessment-editor.css?v=20260825-7">
 </head>
 <body>
   <a class="skip-link" href="#rahForm">ข้ามไปยังแบบประเมิน</a>
@@ -39,18 +39,9 @@
 
     <button class="drawer-backdrop" id="drawerBackdrop" type="button" aria-label="ปิดเมนู" tabindex="-1"></button>
 
-    <main>
-      <header class="topbar">
-        <div class="topbar-start">
-          <button class="menu-toggle" id="menuToggle" type="button" aria-label="เปิดเมนู" aria-controls="mobileDrawer" aria-expanded="false"><span class="menu-icon" aria-hidden="true"></span></button>
-        </div>
-        <div class="top-actions">
-          <button class="button icon-action" id="printButton" type="button" aria-label="พิมพ์" data-tooltip="พิมพ์">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8V3h10v5M7 17H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M7 14h10v7H7zM17 11h.01"/></svg>
-          </button>
-        </div>
-      </header>
+    <button class="menu-toggle mobile-menu-fab" id="menuToggle" type="button" aria-label="เปิดเมนู" aria-controls="mobileDrawer" aria-expanded="false"><span class="menu-icon" aria-hidden="true"></span></button>
 
+    <main>
       <div class="content">
         <section class="hero" id="overview">
           <div>
@@ -63,14 +54,13 @@
           <section class="form-section" id="header-section">
             <div class="section-heading">
               <div><div class="section-kicker">Section 01</div><h2>ข้อมูลการประเมิน</h2><p>Assessment details</p></div>
-              <span class="section-tag">ยืนยันโดยระบบ 2 รายการ</span>
             </div>
             <div class="section-body">
               <div class="field-grid">
                 <div class="field span-3"><label for="assessmentDate">วันที่ทำการประเมิน <span class="required">*</span><small>Assessment date</small></label><input id="assessmentDate" type="date" required></div>
                 <div class="field"><label for="department">งาน / แผนก <span class="required">*</span><small>Assessed department · จากรายการที่ผู้ดูแลกำหนด</small></label><select id="department" name="departmentId" required aria-describedby="departmentStatus"><option value="">กำลังโหลดรายการแผนก…</option></select><small class="field-status" id="departmentStatus" aria-live="polite">กำลังเชื่อมต่อการตั้งค่า</small></div>
                 <div class="field span-3"><label for="staffTotal">จำนวนผู้ปฏิบัติงานทั้งหมด <span class="required">*</span><small>Total staff</small></label><input id="staffTotal" type="number" min="1" placeholder="ระบุจำนวน" required></div>
-                <div class="field span-4"><label for="evaluator">ผู้ประเมิน<small>Evaluator · ระบุชื่อผู้ประเมิน</small></label><input id="evaluator" placeholder="ระบุชื่อผู้ประเมิน"></div>
+                <div class="field span-4"><label for="evaluator">ผู้ประเมิน <span class="required">*</span><small>Evaluator · ระบุชื่อผู้ประเมิน</small></label><input id="evaluator" placeholder="ระบุชื่อผู้ประเมิน" required></div>
                 <div class="field span-8"><label for="additionalEvaluators">ผู้ร่วมประเมิน<small>Additional evaluators · ไม่บังคับ</small></label><input id="additionalEvaluators" placeholder="ระบุชื่อผู้ร่วมประเมิน"></div>
               </div>
             </div>
@@ -133,6 +123,9 @@
       </div>
     </div>
     <div class="submit-actions">
+      <button class="button icon-action" id="printButton" type="button" aria-label="พิมพ์" data-tooltip="พิมพ์">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8V3h10v5M7 17H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M7 14h10v7H7zM17 11h.01"/></svg>
+      </button>
       <button class="button primary icon-action" id="reviewButton" type="button" aria-label="ส่ง" data-tooltip="ส่ง">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4zM22 2 11 13"/></svg>
       </button>
@@ -171,14 +164,14 @@
       { code: 'ERGONOMIC', icon: 'assets/category-icons/ergonomic.png', th: 'สิ่งคุกคามทางการยศาสตร์', en: 'Ergonomic Hazards', hazards: [
         ['heavy_lifting_patient_transfer', 'ออกแรงยกวัสดุ สิ่งของ หรือผู้ป่วยที่มีน้ำหนักมาก', 'Heavy Lifting / Patient Transfer'], ['lifting_with_twisting', 'ออกแรงยกของด้วยท่าทางบิดเบี้ยวตัว', 'Lifting with Twisting'], ['unnatural_posture', 'ท่าทางหรือการเคลื่อนไหวที่ฝืนธรรมชาติ', 'Unnatural Posture or Movement'], ['prolonged_standing_sitting', 'ยืนหรือนั่งทำงานอยู่กับที่ติดต่อกันนาน', 'Prolonged Standing or Sitting'], ['unsuitable_desk_chair', 'นั่งทำงานโดยมีโต๊ะหรือเก้าอี้ไม่เหมาะสม', 'Unsuitable Desk or Chair'], ['repetitive_tasks', 'รูปแบบการทำงานซ้ำๆ', 'Repetitive Tasks'], ['high_push_pull_force', 'การใช้แรงดึงหรือดันที่ต้องออกแรงมาก', 'High Push / Pull Force'], ['unsuitable_grip_equipment', 'ใช้อุปกรณ์ที่ไม่เหมาะกับการหยิบจับ', 'Unsuitable Equipment for Gripping']
       ]},
+      { code: 'PSYCHOSOCIAL', icon: 'assets/category-icons/psychosocial.png', th: 'สิ่งคุกคามทางจิตวิทยาสังคม', en: 'Psychosocial Hazards', hazards: [
+        ['work_stress', 'ความเครียดจากการทำงาน', 'Work Stress'], ['patient_relative_violence', 'ความรุนแรงจากผู้ป่วยหรือญาติ', 'Violence from Patients or Relatives'], ['coworker_violence', 'ความรุนแรงจากเพื่อนร่วมงาน', 'Coworker Violence'], ['insufficient_rest', 'พักผ่อนไม่เพียงพอ', 'Insufficient Rest']
+      ]},
       { code: 'SAFETY_ACCIDENT', icon: 'assets/category-icons/safety.png', th: 'อุบัติเหตุและสภาพงานไม่ปลอดภัย', en: 'Safety and Accident Hazards', hazards: [
         ['sharps', 'อุปกรณ์หรือเครื่องมือที่มีความแหลมหรือคม', 'Sharps / Needlestick'], ['machinery', 'การใช้เครื่องจักรกล', 'Machinery Operation'], ['vehicle_use', 'การใช้ยานพาหนะ', 'Vehicle Use'], ['work_at_height', 'การทำงานในที่สูง', 'Work at Height'], ['confined_space', 'การทำงานในที่คับแคบ', 'Confined Space Work'], ['slippery_surface', 'สภาพพื้นที่มีลักษณะลื่น', 'Slippery Surface'], ['hot_objects', 'การทำงานกับสิ่งของร้อน', 'Work with Hot Objects'], ['pathway_obstruction', 'มีสิ่งกีดขวางทางเดิน', 'Pathway Obstruction']
       ]},
       { code: 'FIRE_DISASTER', icon: 'assets/category-icons/fire.png', th: 'อัคคีภัยและภัยพิบัติ', en: 'Fire and Disaster Hazards', hazards: [
         ['generator', 'การทำงานกับเครื่องกำเนิดไฟฟ้า', 'Generator Work'], ['electrical_work', 'การทำงานเกี่ยวกับไฟฟ้าหรือสายไฟ', 'Electrical Work / Wiring'], ['electrical_equipment', 'การใช้อุปกรณ์หรือเครื่องมือไฟฟ้า', 'Electrical Equipment'], ['water_heater_boiler', 'เครื่องทำน้ำร้อนหรือหม้อต้มน้ำ', 'Water Heater / Boiler Work'], ['flammable_storage', 'การเก็บวัตถุไวไฟหรือถังแก๊ส', 'Flammable Material / Gas Storage'], ['flammable_chemical_gas_use', 'การใช้สารเคมีหรือก๊าซที่ติดไฟง่าย', 'Use of Flammable Chemicals or Gases']
-      ]},
-      { code: 'PSYCHOSOCIAL', icon: 'assets/category-icons/psychosocial.png', th: 'สิ่งคุกคามทางจิตวิทยาสังคม', en: 'Psychosocial Hazards', hazards: [
-        ['work_stress', 'ความเครียดจากการทำงาน', 'Work Stress'], ['patient_relative_violence', 'ความรุนแรงจากผู้ป่วยหรือญาติ', 'Violence from Patients or Relatives'], ['coworker_violence', 'ความรุนแรงจากเพื่อนร่วมงาน', 'Coworker Violence'], ['insufficient_rest', 'พักผ่อนไม่เพียงพอ', 'Insufficient Rest']
       ]},
       { code: 'INDOOR_AIR_QUALITY', icon: 'assets/category-icons/indoor-air.png', th: 'คุณภาพอากาศภายในอาคาร', en: 'Indoor Air Quality Hazards', hazards: [
         ['crowded_stuffy', 'มีความรู้สึกแออัดหรืออึดอัด', 'Crowded / Stuffy Conditions'], ['extreme_temperature', 'อากาศร้อนหรือเย็นเกินไป', 'Excessively Hot or Cold Air'], ['chemical_odor', 'มีกลิ่นฉุนของสารเคมี', 'Pungent Chemical Odor'], ['poor_ventilation', 'ระบบระบายอากาศไม่ดี', 'Poor Ventilation'], ['dust', 'มีฝุ่น', 'Dust'], ['dark_damp', 'อับทึบหรือชื้น', 'Dark / Damp Conditions'], ['surface_mold', 'พบเชื้อราตามพื้นผิว', 'Surface Mold']
@@ -235,9 +228,9 @@
       return `<div class="hazard-evidence">
         <div class="attachment-row">
           <span class="attachment-label">รูปหลักฐาน <small>ไม่บังคับ</small></span>
-          <label class="attachment-picker">
+          <label class="attachment-picker" aria-label="${attachment ? 'เปลี่ยนรูป' : 'แนบรูป'}" title="${attachment ? 'เปลี่ยนรูป' : 'แนบรูป'}">
             <input class="hazard-attachment" type="file" accept="${hazardAttachmentAccept}" aria-label="แนบรูปหลักฐานสำหรับ ${escapeHtml(hazardLabel)}">
-            <span class="attachment-action">${attachment ? 'เปลี่ยนรูป' : 'แนบรูป'}</span>
+            <span class="attachment-action" aria-hidden="true"><svg class="attachment-icon" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="8.5" cy="9" r="1.5"></circle><path d="m5 17 4.5-4.5 3.25 3.25 2.25-2.25L19 17"></path></svg></span>
           </label>
           <span class="attachment-selected" data-selected="${attachment ? 'true' : 'false'}" ${attachment ? '' : 'hidden'} aria-live="polite">
             <strong class="attachment-file-name">${escapeHtml(attachment?.name || '')}</strong>
@@ -254,7 +247,10 @@
       selected.hidden = !attachment;
       selected.querySelector('.attachment-file-name').textContent = attachment?.name || '';
       selected.querySelector('.attachment-file-meta').textContent = attachment ? formatFileSize(attachment.sizeBytes) : '';
-      row.querySelector('.attachment-action').textContent = attachment ? 'เปลี่ยนรูป' : 'แนบรูป';
+      const picker = row.querySelector('.attachment-picker');
+      const pickerLabel = attachment ? 'เปลี่ยนรูป' : 'แนบรูป';
+      picker.setAttribute('aria-label', pickerLabel);
+      picker.title = pickerLabel;
       row.querySelector('.attachment-remove').hidden = !attachment;
     }
 
@@ -296,12 +292,12 @@
       stepListEl.innerHTML = state.steps.map((step, index) => `<div class="step-card" data-step-index="${index}">
         <div class="step-number">${String(index + 1).padStart(2, '0')}</div>
         <div class="step-main-fields">
-          <div class="mini-field step-work"><label>ขั้นตอนการทำงาน</label><textarea data-field="work" required>${escapeHtml(step.work)}</textarea></div>
-          <div class="mini-field step-hazards"><label>สิ่งคุกคามหลัก</label><textarea data-field="hazards" required>${escapeHtml(step.hazards)}</textarea></div>
+          <div class="mini-field step-work"><label>ขั้นตอนการทำงาน</label><textarea data-field="work" placeholder="เช่น เตรียมและผสมสารเคมี" required>${escapeHtml(step.work)}</textarea></div>
+          <div class="mini-field step-hazards"><label>สิ่งคุกคามหลัก</label><textarea data-field="hazards" placeholder="เช่น สารเคมี HCl" required>${escapeHtml(step.hazards)}</textarea></div>
         </div>
         <div class="step-meta-fields">
-          <div class="mini-field duration"><label>ระยะเวลา</label><input data-field="duration" value="${escapeHtml(step.duration)}" required></div>
-          <div class="mini-field staff"><label>จำนวนคน</label><input data-field="staff" type="number" min="1" value="${escapeHtml(step.staff)}" required></div>
+          <div class="mini-field duration"><label>ระยะเวลาต่อครั้ง/กะ</label><input data-field="duration" value="${escapeHtml(step.duration)}" placeholder="เช่น 30 นาที/ครั้ง หรือ 8 ชั่วโมง/กะ" required></div>
+          <div class="mini-field staff"><label>จำนวนคน</label><input data-field="staff" type="number" min="1" value="${escapeHtml(step.staff)}" placeholder="ระบุจำนวน" required></div>
         </div>
         <button class="icon-button remove" type="button" aria-label="ลบขั้นตอน" title="ลบขั้นตอน">×</button>
       </div>`).join('');
@@ -340,20 +336,19 @@
         ${titleBlock}
         <div class="hazard-head">
           <div class="hazard-name"><strong>${customId ? 'สิ่งคุกคามอื่น' : th}</strong><small>${customId ? 'Other hazard' : en}</small></div>
-          <div class="risk-switch">
-            <button type="button" class="risk-choice present ${data.hasRisk === true ? 'selected' : ''}" data-risk="true">มีความเสี่ยง</button>
-            <button type="button" class="risk-choice absent ${data.hasRisk === false ? 'selected' : ''}" data-risk="false">ไม่มีความเสี่ยง</button>
+          <div class="risk-switch segmented" role="group" aria-label="สถานะความเสี่ยงของ ${customId ? 'สิ่งคุกคามอื่น' : th}">
+            <button type="button" class="segment risk-choice present ${data.hasRisk === true ? 'selected' : ''}" data-risk="true" aria-pressed="${data.hasRisk === true}">มีความเสี่ยง</button>
+            <button type="button" class="segment risk-choice absent ${data.hasRisk === false ? 'selected' : ''}" data-risk="false" aria-pressed="${data.hasRisk === false}">ไม่มีความเสี่ยง</button>
             ${customId ? '<button type="button" class="icon-button remove-custom" aria-label="ลบสิ่งคุกคาม">×</button>' : ''}
           </div>
         </div>
         <div class="risk-fields ${data.hasRisk === true ? 'visible' : ''}">
-          <div class="mini-field field-staff"><label>บุคลากร (คน)</label><input class="hazard-staff" type="number" min="0" value="${escapeHtml(data.staff ?? '')}"></div>
-          <div class="mini-field field-clients"><label>ผู้รับบริการ (คน)</label><input class="hazard-clients" type="number" min="0" value="${escapeHtml(data.clients ?? '')}"></div>
+          <div class="mini-field field-staff"><label>บุคลากร (คน)</label><input class="hazard-staff" type="number" min="0" value="${escapeHtml(data.staff ?? '')}" placeholder="ระบุจำนวน"></div>
+          <div class="mini-field field-clients"><label>ผู้รับบริการ (คน)</label><input class="hazard-clients" type="number" min="0" value="${escapeHtml(data.clients ?? '')}" placeholder="ระบุจำนวน"></div>
           <div class="mini-field field-exposure"><label>โอกาสรับสัมผัส A</label><div class="score-toggle" role="group" aria-label="โอกาสรับสัมผัส A">${[[1, 'น้อย'], [2, 'ปานกลาง'], [3, 'มาก']].map(([value, label]) => `<button type="button" class="score-option ${Number(data.a) === value ? 'selected' : ''}" data-score="a" data-value="${value}" aria-pressed="${Number(data.a) === value}"><strong>${value}</strong><span>${label}</span></button>`).join('')}</div></div>
           <div class="mini-field field-severity"><label>ความรุนแรง B</label><div class="score-toggle" role="group" aria-label="ความรุนแรง B">${[[1, 'เล็กน้อย'], [2, 'ปานกลาง'], [3, 'ร้ายแรง']].map(([value, label]) => `<button type="button" class="score-option ${Number(data.b) === value ? 'selected' : ''}" data-score="b" data-value="${value}" aria-pressed="${Number(data.b) === value}"><strong>${value}</strong><span>${label}</span></button>`).join('')}</div></div>
-          <div class="mini-field field-controls"><label>วิธีควบคุมที่มีอยู่ <span class="required">*</span></label><textarea class="hazard-controls" placeholder="หากไม่มี ให้ระบุว่า ไม่มี">${escapeHtml(data.controls || '')}</textarea></div>
+          <div class="mini-field field-controls"><label>วิธีควบคุมที่มีอยู่ <span class="required">*</span></label><textarea class="hazard-controls" placeholder="ระบุวิธีควบคุมความเสี่ยงที่มีอยู่ปัจจุบัน">${escapeHtml(data.controls || '')}</textarea></div>
           <div class="mini-field field-score"><label>ระดับความเสี่ยง C = A × B</label><div class="score-display ${result ? result.level : 'empty'}" aria-live="polite"><strong class="score-number">${result ? result.score : '—'}</strong><span class="risk-badge ${result ? result.level : 'empty'}">${result ? result.label : 'รอคะแนน'}</span></div>${attachmentMarkup(data, customId ? data.title || 'สิ่งคุกคามอื่น' : th)}</div>
-          <div class="mini-field field-recommendation recommendation ${result && result.score >= 3 ? 'visible' : ''}"><label>ข้อเสนอแนะของผู้ประเมิน <span class="required">*</span></label><textarea class="hazard-recommendation" placeholder="ระบุสิ่งที่ควรปรับปรุง">${escapeHtml(data.recommendation || '')}</textarea></div>
         </div>
       </div>`;
     }
@@ -378,11 +373,13 @@
           </summary>
           <div class="category-tools">
             <button class="button ghost small mark-none" type="button">ไม่พบความเสี่ยงทั้งหมวด</button>
-            <button class="button small add-custom" type="button">＋ เพิ่มสิ่งคุกคามอื่น</button>
           </div>
           <div class="hazard-list">
             ${category.hazards.map(hazard => hazardRowMarkup(category, hazard)).join('')}
             ${customs.map(([id]) => hazardRowMarkup(category, ['OTHER', 'อื่นๆ', 'Other'], id)).join('')}
+          </div>
+          <div class="category-footer">
+            <button class="button small add-custom" type="button">＋ เพิ่มสิ่งคุกคามอื่น</button>
           </div>
         </details>`;
       }).join('');
@@ -422,6 +419,7 @@
           if (!data.hasRisk) Object.keys(data).filter(prop => !['hasRisk', 'category', 'title'].includes(prop)).forEach(prop => delete data[prop]);
           row.querySelectorAll('.risk-choice').forEach(choice => choice.classList.remove('selected'));
           button.classList.add('selected');
+          row.querySelectorAll('.risk-choice').forEach(choice => choice.setAttribute('aria-pressed', String(choice === button)));
           row.querySelector('.risk-fields').classList.toggle('visible', data.hasRisk);
           if (!data.hasRisk) {
             row.querySelector('.hazard-attachment').value = '';
@@ -433,7 +431,7 @@
 
         const bindings = [
           ['.hazard-staff', 'staff', true], ['.hazard-clients', 'clients', true],
-          ['.hazard-controls', 'controls', false], ['.hazard-recommendation', 'recommendation', false], ['.custom-hazard-input', 'title', false]
+          ['.hazard-controls', 'controls', false], ['.custom-hazard-input', 'title', false]
         ];
         bindings.forEach(([selector, property, numeric]) => {
           const input = row.querySelector(selector);
@@ -491,7 +489,6 @@
       const badge = row.querySelector('.risk-badge');
       badge.className = `risk-badge ${result ? result.level : 'empty'}`;
       badge.textContent = result ? result.label : 'รอคะแนน';
-      row.querySelector('.recommendation').classList.toggle('visible', Boolean(result && result.score >= 3));
     }
 
     function getRiskRows() {
@@ -517,13 +514,13 @@
         return;
       }
       summaryBodyEl.innerHTML = `<div class="summary-table-wrap"><table class="summary-table">
-        <thead><tr><th>สิ่งคุกคาม</th><th>A</th><th>B</th><th>C</th><th>ระดับ</th><th>ผู้สัมผัส</th><th>วิธีควบคุม / ข้อเสนอแนะ</th></tr></thead>
+        <thead><tr><th>สิ่งคุกคาม</th><th>A</th><th>B</th><th>C</th><th>ระดับ</th><th>ผู้สัมผัส</th><th>วิธีควบคุม</th></tr></thead>
         <tbody>${rows.map(row => `<tr>
           <td><strong>${escapeHtml(row.th)}</strong><br><span>${escapeHtml(row.category.th)}</span></td>
           <td>${row.data.a || '—'}</td><td>${row.data.b || '—'}</td><td><strong>${row.result?.score || '—'}</strong></td>
           <td><span class="risk-badge ${row.result?.level || 'empty'}">${row.result?.label || 'ไม่ครบ'}</span></td>
           <td>บุคลากร ${row.data.staff ?? '—'}<br>ผู้รับบริการ ${row.data.clients ?? '—'}</td>
-          <td>${escapeHtml(row.data.controls || 'ยังไม่ระบุ')}${row.data.recommendation ? `<br><strong>แนะนำ:</strong> ${escapeHtml(row.data.recommendation)}` : ''}</td>
+          <td>${escapeHtml(row.data.controls || 'ยังไม่ระบุ')}</td>
         </tr>`).join('')}</tbody>
       </table></div>`;
     }
@@ -595,9 +592,11 @@
     function validateForReview() {
       const assessmentDate = document.getElementById('assessmentDate');
       const staffTotal = document.getElementById('staffTotal');
+      const evaluator = document.getElementById('evaluator');
       if (!assessmentDate.value) return rejectReview(assessmentDate, 'กรุณาระบุวันที่ทำการประเมิน');
       if (!departmentEl.value || !window.RAHDepartmentService.getDepartment(departmentEl.value)) return rejectReview(departmentEl, 'กรุณาเลือกแผนกจากรายการที่ผู้ดูแลกำหนด');
       if (!(Number(staffTotal.value) > 0)) return rejectReview(staffTotal, 'กรุณาระบุจำนวนผู้ปฏิบัติงานทั้งหมด');
+      if (!evaluator.value.trim()) return rejectReview(evaluator, 'กรุณาระบุชื่อผู้ประเมิน');
 
       const firstMissingChecklist = checklistItems.find(item => !state.checklist[item.key]?.status);
       if (firstMissingChecklist) {
@@ -621,7 +620,7 @@
         return rejectReview(row?.querySelector('.risk-choice.present'), `ยังประเมินสิ่งคุกคามไม่ครบ ${unansweredCount} รายการ`);
       }
 
-      const invalidRisk = getRiskRows().find(row => !row.data.a || !row.data.b || row.data.staff === undefined || row.data.clients === undefined || !String(row.data.controls || '').trim() || (row.result?.score >= 3 && !String(row.data.recommendation || '').trim()));
+      const invalidRisk = getRiskRows().find(row => !row.data.a || !row.data.b || row.data.staff === undefined || row.data.clients === undefined || !String(row.data.controls || '').trim());
       if (invalidRisk) {
         const row = document.querySelector(`[data-hazard-key="${invalidRisk.key}"]`);
         let target;
@@ -638,12 +637,9 @@
         } else if (invalidRisk.data.clients === undefined) {
           target = row?.querySelector('.hazard-clients');
           fieldLabel = 'จำนวนผู้รับบริการ';
-        } else if (!String(invalidRisk.data.controls || '').trim()) {
+        } else {
           target = row?.querySelector('.hazard-controls');
           fieldLabel = 'วิธีควบคุมที่มีอยู่';
-        } else {
-          target = row?.querySelector('.hazard-recommendation');
-          fieldLabel = 'ข้อเสนอแนะของผู้ประเมิน';
         }
         return rejectReview(target, `กรุณาระบุ${fieldLabel}สำหรับ ${invalidRisk.th}`);
       }
@@ -691,7 +687,7 @@
           exposureScoreA: Number(row.data.a),
           severityScoreB: Number(row.data.b),
           existingControls: String(row.data.controls || '').trim(),
-          recommendation: String(row.data.recommendation || '').trim(),
+          recommendation: '',
           evidenceAttachment: row.data.attachment ? {
             name: row.data.attachment.name,
             mimeType: row.data.attachment.mimeType,
@@ -709,10 +705,12 @@
         document.title = `RAH.01 — ${config.hospitalName}`;
         departmentEl.innerHTML = '<option value="">เลือกแผนก</option>' + config.departments.map(department => `<option value="${escapeHtml(department.id)}">${escapeHtml(department.nameTh)}${department.nameEn ? ` · ${escapeHtml(department.nameEn)}` : ''}</option>`).join('');
         if (restoredDepartmentId && config.departments.some(department => department.id === restoredDepartmentId)) departmentEl.value = restoredDepartmentId;
-        departmentStatusEl.textContent = config.departments.length ? `พร้อมใช้งาน ${config.departments.length} แผนก` : 'ยังไม่มีแผนกที่เปิดใช้งานใน Settings';
+        departmentStatusEl.textContent = config.departments.length ? '' : 'ยังไม่มีแผนกที่เปิดใช้งานใน Settings';
+        departmentStatusEl.hidden = config.departments.length > 0;
       } catch (error) {
         departmentEl.innerHTML = '<option value="">โหลดรายการแผนกไม่สำเร็จ</option>';
         departmentStatusEl.textContent = 'ติดต่อผู้ดูแลระบบเพื่อตรวจสอบ Settings';
+        departmentStatusEl.hidden = false;
         showToast('โหลดรายการแผนกไม่สำเร็จ');
       }
       updateProgress();

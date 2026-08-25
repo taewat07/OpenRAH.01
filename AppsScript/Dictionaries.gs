@@ -12,8 +12,8 @@ var RAH01_CHECKLIST = Object.freeze({
 });
 var RAH01_CATEGORIES = Object.freeze({
   PHYSICAL: 'Physical Hazards', BIOLOGICAL: 'Biological Hazards', CHEMICAL: 'Chemical Hazards',
-  ERGONOMIC: 'Ergonomic Hazards', SAFETY_ACCIDENT: 'Safety and Accident Hazards',
-  FIRE_DISASTER: 'Fire and Disaster Hazards', PSYCHOSOCIAL: 'Psychosocial Hazards',
+  ERGONOMIC: 'Ergonomic Hazards', PSYCHOSOCIAL: 'Psychosocial Hazards',
+  SAFETY_ACCIDENT: 'Safety and Accident Hazards', FIRE_DISASTER: 'Fire and Disaster Hazards',
   INDOOR_AIR_QUALITY: 'Indoor Air Quality Hazards'
 });
 

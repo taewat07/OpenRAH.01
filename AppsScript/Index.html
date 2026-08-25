@@ -38,18 +38,9 @@
 
     <button class="drawer-backdrop" id="drawerBackdrop" type="button" aria-label="ปิดเมนู" tabindex="-1"></button>
 
-    <main>
-      <header class="topbar">
-        <div class="topbar-start">
-          <button class="menu-toggle" id="menuToggle" type="button" aria-label="เปิดเมนู" aria-controls="mobileDrawer" aria-expanded="false"><span class="menu-icon" aria-hidden="true"></span></button>
-        </div>
-        <div class="top-actions">
-          <button class="button icon-action" id="printButton" type="button" aria-label="พิมพ์" data-tooltip="พิมพ์">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8V3h10v5M7 17H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M7 14h10v7H7zM17 11h.01"/></svg>
-          </button>
-        </div>
-      </header>
+    <button class="menu-toggle mobile-menu-fab" id="menuToggle" type="button" aria-label="เปิดเมนู" aria-controls="mobileDrawer" aria-expanded="false"><span class="menu-icon" aria-hidden="true"></span></button>
 
+    <main>
       <div class="content">
         <section class="hero" id="overview">
           <div>
@@ -62,14 +53,13 @@
           <section class="form-section" id="header-section">
             <div class="section-heading">
               <div><div class="section-kicker">Section 01</div><h2>ข้อมูลการประเมิน</h2><p>Assessment details</p></div>
-              <span class="section-tag">ยืนยันโดยระบบ 2 รายการ</span>
             </div>
             <div class="section-body">
               <div class="field-grid">
                 <div class="field span-3"><label for="assessmentDate">วันที่ทำการประเมิน <span class="required">*</span><small>Assessment date</small></label><input id="assessmentDate" type="date" required></div>
                 <div class="field"><label for="department">งาน / แผนก <span class="required">*</span><small>Assessed department · จากรายการที่ผู้ดูแลกำหนด</small></label><select id="department" name="departmentId" required aria-describedby="departmentStatus"><option value="">กำลังโหลดรายการแผนก…</option></select><small class="field-status" id="departmentStatus" aria-live="polite">กำลังเชื่อมต่อการตั้งค่า</small></div>
                 <div class="field span-3"><label for="staffTotal">จำนวนผู้ปฏิบัติงานทั้งหมด <span class="required">*</span><small>Total staff</small></label><input id="staffTotal" type="number" min="1" placeholder="ระบุจำนวน" required></div>
-                <div class="field span-4"><label for="evaluator">ผู้ประเมิน<small>Evaluator · ระบุชื่อผู้ประเมิน</small></label><input id="evaluator" placeholder="ระบุชื่อผู้ประเมิน"></div>
+                <div class="field span-4"><label for="evaluator">ผู้ประเมิน <span class="required">*</span><small>Evaluator · ระบุชื่อผู้ประเมิน</small></label><input id="evaluator" placeholder="ระบุชื่อผู้ประเมิน" required></div>
                 <div class="field span-8"><label for="additionalEvaluators">ผู้ร่วมประเมิน<small>Additional evaluators · ไม่บังคับ</small></label><input id="additionalEvaluators" placeholder="ระบุชื่อผู้ร่วมประเมิน"></div>
               </div>
             </div>
@@ -132,6 +122,9 @@
       </div>
     </div>
     <div class="submit-actions">
+      <button class="button icon-action" id="printButton" type="button" aria-label="พิมพ์" data-tooltip="พิมพ์">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8V3h10v5M7 17H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M7 14h10v7H7zM17 11h.01"/></svg>
+      </button>
       <button class="button primary icon-action" id="reviewButton" type="button" aria-label="ส่ง" data-tooltip="ส่ง">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4zM22 2 11 13"/></svg>
       </button>
