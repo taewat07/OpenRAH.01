@@ -794,7 +794,7 @@ h1, h2, h3 { font-family: var(--font-display); }
       left: 248px;
       z-index: 30;
       display: grid;
-      grid-template-columns: minmax(150px, auto) minmax(280px, 1fr) auto;
+      grid-template-columns: minmax(280px, 1fr) auto;
       align-items: center;
       gap: 18px;
       padding: 12px clamp(20px, 4vw, 52px);
@@ -803,8 +803,6 @@ h1, h2, h3 { font-family: var(--font-display); }
       backdrop-filter: blur(18px);
     }
 
-    .save-state { color: var(--ink-soft); font-size: .7rem; }
-    .save-state strong { color: var(--ink); }
     .footer-progress {
       display: grid;
       grid-template-columns: auto minmax(180px, 1fr);
@@ -848,7 +846,7 @@ h1, h2, h3 { font-family: var(--font-display); }
       background: var(--green);
       transform: translateY(-1px);
     }
-    .submit-actions { display: flex; gap: 8px; }
+    .submit-actions { display: flex; justify-content: flex-end; gap: 8px; }
 
     .toast {
       position: fixed;
@@ -926,13 +924,11 @@ h1, h2, h3 { font-family: var(--font-display); }
       .risk-fields .field-controls { grid-column: span 6; }
       .risk-fields .field-recommendation { grid-column: 1 / -1; }
       .sticky-submit { left: 0; padding: 10px 12px; }
-      .save-state { display: none; }
-      .sticky-submit { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+      .sticky-submit { grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
       .footer-progress { grid-template-columns: auto minmax(0, 1fr); max-width: none; padding-right: 7px; }
       .progress-segments { gap: 2px; }
       .progress-segment { height: 12px; }
-      .submit-actions { width: 100%; }
-      .submit-actions .button { flex: 1; }
+      .submit-actions { width: auto; }
       .submit-actions .icon-action { flex: 0 0 44px; }
       .toast { right: 12px; bottom: 76px; left: 12px; }
     }

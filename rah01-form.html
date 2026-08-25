@@ -123,7 +123,6 @@
   </div>
 
   <footer class="sticky-submit">
-    <div class="save-state"><strong>แบบร่างยังไม่ส่ง</strong><br><span id="saveStateText">บันทึกเฉพาะในเบราว์เซอร์เซสชันนี้</span></div>
     <div class="footer-progress" id="footerProgress" role="progressbar" aria-label="ความคืบหน้าการกรอกแบบประเมิน" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
       <div class="footer-progress-meta"><span>ความคืบหน้า</span><strong id="progressValue">0%</strong></div>
       <div class="progress-segments" aria-hidden="true">
@@ -134,9 +133,6 @@
       </div>
     </div>
     <div class="submit-actions">
-      <button class="button icon-action" id="saveBottomButton" type="button" aria-label="บันทึกร่าง" data-tooltip="บันทึกร่าง">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3h13l3 3v15H4z"/><path d="M8 3v6h8V3M8 21v-7h8v7"/></svg>
-      </button>
       <button class="button primary icon-action" id="reviewButton" type="button" aria-label="ส่ง" data-tooltip="ส่ง">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4zM22 2 11 13"/></svg>
       </button>
@@ -565,48 +561,6 @@
       });
     }
 
-    function saveDraft() {
-      const draft = {
-        state,
-        header: {
-          departmentId: departmentEl.value,
-          evaluatorName: document.getElementById('evaluator').value,
-          staffTotal: document.getElementById('staffTotal').value,
-          additionalEvaluators: document.getElementById('additionalEvaluators').value
-        },
-        savedAt: new Date().toISOString()
-      };
-      sessionStorage.setItem('rah01:preview:draft:1.1.0', JSON.stringify(draft));
-      const time = new Intl.DateTimeFormat('th-TH', { hour: '2-digit', minute: '2-digit' }).format(new Date());
-      document.getElementById('saveStateText').textContent = `บันทึกล่าสุด ${time} น.`;
-      showToast('บันทึกแบบร่างในเซสชันนี้แล้ว');
-    }
-
-    function restoreDraft() {
-      const rawDraft = sessionStorage.getItem('rah01:preview:draft:1.1.0');
-      if (!rawDraft) return;
-      try {
-        const draft = JSON.parse(rawDraft);
-        if (!draft.state || !Array.isArray(draft.state.steps)) throw new Error('Invalid draft');
-        state.checklist = draft.state.checklist || {};
-        state.hazards = draft.state.hazards || {};
-        state.customHazards = draft.state.customHazards || {};
-        state.steps = draft.state.steps;
-        restoredDepartmentId = String(draft.header?.departmentId || '');
-        const isLegacyDemoHeader = draft.header?.evaluatorName === 'นางทดลอง ทดสอบ'
-          && String(draft.header?.staffTotal || '') === '34';
-        document.getElementById('evaluator').value = isLegacyDemoHeader ? '' : String(draft.header?.evaluatorName || '');
-        document.getElementById('staffTotal').value = isLegacyDemoHeader ? '' : String(draft.header?.staffTotal || '');
-        document.getElementById('additionalEvaluators').value = draft.header?.additionalEvaluators || '';
-        const savedTime = draft.savedAt ? new Date(draft.savedAt) : null;
-        document.getElementById('saveStateText').textContent = savedTime && !Number.isNaN(savedTime.getTime())
-          ? `เรียกคืนแบบร่างที่บันทึก ${new Intl.DateTimeFormat('th-TH', { hour: '2-digit', minute: '2-digit' }).format(savedTime)} น.`
-          : 'เรียกคืนแบบร่างจากเซสชันนี้แล้ว';
-      } catch (error) {
-        sessionStorage.removeItem('rah01:preview:draft:1.1.0');
-      }
-    }
-
     function setSmartAssessmentDate() {
       const input = document.getElementById('assessmentDate');
       const today = new Date();
@@ -828,7 +782,6 @@
     window.addEventListener('resize', scheduleScrollSpy);
     scheduleScrollSpy();
     document.getElementById('printButton').addEventListener('click', () => window.print());
-    document.getElementById('saveBottomButton').addEventListener('click', saveDraft);
     document.getElementById('reviewButton').addEventListener('click', validateForReview);
 
     let printOpenState = [];
@@ -841,7 +794,6 @@
     });
 
     setSmartAssessmentDate();
-    restoreDraft();
     loadDepartments();
     renderChecklist();
     renderSteps();

@@ -589,48 +589,6 @@
       });
     }
 
-    function saveDraft() {
-      const draft = {
-        state,
-        header: {
-          departmentId: departmentEl.value,
-          evaluatorName: document.getElementById('evaluator').value,
-          staffTotal: document.getElementById('staffTotal').value,
-          additionalEvaluators: document.getElementById('additionalEvaluators').value
-        },
-        savedAt: new Date().toISOString()
-      };
-      sessionStorage.setItem('rah01:preview:draft:1.1.0', JSON.stringify(draft));
-      const time = new Intl.DateTimeFormat('th-TH', { hour: '2-digit', minute: '2-digit' }).format(new Date());
-      document.getElementById('saveStateText').textContent = `บันทึกล่าสุด ${time} น.`;
-      showToast('บันทึกแบบร่างในเซสชันนี้แล้ว');
-    }
-
-    function restoreDraft() {
-      const rawDraft = sessionStorage.getItem('rah01:preview:draft:1.1.0');
-      if (!rawDraft) return;
-      try {
-        const draft = JSON.parse(rawDraft);
-        if (!draft.state || !Array.isArray(draft.state.steps)) throw new Error('Invalid draft');
-        state.checklist = draft.state.checklist || {};
-        state.hazards = draft.state.hazards || {};
-        state.customHazards = draft.state.customHazards || {};
-        state.steps = draft.state.steps;
-        restoredDepartmentId = String(draft.header?.departmentId || '');
-        const isLegacyDemoHeader = draft.header?.evaluatorName === 'นางทดลอง ทดสอบ'
-          && String(draft.header?.staffTotal || '') === '34';
-        document.getElementById('evaluator').value = isLegacyDemoHeader ? '' : String(draft.header?.evaluatorName || '');
-        document.getElementById('staffTotal').value = isLegacyDemoHeader ? '' : String(draft.header?.staffTotal || '');
-        document.getElementById('additionalEvaluators').value = draft.header?.additionalEvaluators || '';
-        const savedTime = draft.savedAt ? new Date(draft.savedAt) : null;
-        document.getElementById('saveStateText').textContent = savedTime && !Number.isNaN(savedTime.getTime())
-          ? `เรียกคืนแบบร่างที่บันทึก ${new Intl.DateTimeFormat('th-TH', { hour: '2-digit', minute: '2-digit' }).format(savedTime)} น.`
-          : 'เรียกคืนแบบร่างจากเซสชันนี้แล้ว';
-      } catch (error) {
-        sessionStorage.removeItem('rah01:preview:draft:1.1.0');
-      }
-    }
-
     function setSmartAssessmentDate() {
       const input = document.getElementById('assessmentDate');
       const today = new Date();
@@ -852,7 +810,6 @@
     window.addEventListener('resize', scheduleScrollSpy);
     scheduleScrollSpy();
     document.getElementById('printButton').addEventListener('click', () => window.print());
-    document.getElementById('saveBottomButton').addEventListener('click', saveDraft);
     document.getElementById('reviewButton').addEventListener('click', validateForReview);
 
     let printOpenState = [];
@@ -865,7 +822,6 @@
     });
 
     setSmartAssessmentDate();
-    restoreDraft();
     loadDepartments();
     renderChecklist();
     renderSteps();
@@ -900,11 +856,9 @@
       try {
         const result = await window.RAHDepartmentService.submitAssessment(event.detail, requestId, attachments);
         sessionStorage.removeItem(requestKey);
-        sessionStorage.removeItem('rah01:preview:draft:1.1.0');
         sessionStorage.removeItem('rah01:preview:review:1.1.0');
         submissionInProgress = false;
         button.disabled = false;
-        document.getElementById('saveStateText').textContent = `ส่งสำเร็จ · ${result.reportNumber}`;
         showToast(`ส่งสำเร็จ เลขที่รายงาน ${result.reportNumber}`);
       } catch (error) {
         button.disabled = false;
