@@ -1,24 +1,25 @@
-# OpenRAH01 Apps Script deployment
+# การติดตั้ง OpenRAH01 บน Google Apps Script
 
-This directory is the copy-ready Google Apps Script package for the native Google Sheet created from `RAH01_Template.xlsx`.
+โฟลเดอร์นี้เป็นชุดไฟล์ Google Apps Script ที่พร้อมคัดลอกไปใช้กับ Google Sheets ซึ่งสร้างจาก `RAH01_Template.xlsx`
 
-## Install
+## วิธีติดตั้ง
 
-1. Open the native Google Sheet.
-2. Open **Extensions → Apps Script**.
-3. Rename the Apps Script project to `OpenRAH01`.
-4. Replace the default `Code.gs` with this directory's `Code.gs`.
-5. Add the remaining `.gs` files with the exact filenames shown here.
-6. Add three HTML files named `Index`, `Styles`, and `Scripts`, then paste the matching `.html` contents.
-7. Open **Project Settings**, enable showing `appsscript.json`, and replace its contents with this directory's manifest.
-8. Select `setupRah01Production` in the function menu and run it once. Approve the requested Sheet, Drive-file, and identity permissions. Rerunning this function safely adds the configuration panel to older templates.
-9. In `Settings`, replace the yellow `H4` value beside `hospital_name` with the hospital's official display name.
-10. Review the returned execution log and record the private attachment folder ID.
-11. Run `clearBundledSyntheticData` once before accepting real submissions. Its safety guard refuses to run when non-bundled assessment IDs are present.
-12. Select **Deploy → New deployment → Web app**. Execute as the deploying hospital administrator and restrict access to the hospital Google Workspace domain.
-13. Open the `/exec` URL and confirm the hero subtitle shows the configured hospital name. Complete one controlled test submission, then confirm rows in all six operational sheets plus the private attachment folder.
+1. อัปโหลด `RAH01_Template.xlsx` ไปยัง Google Drive แล้วเปิดเป็น Google Sheets
+2. ไปที่ **ส่วนขยาย → Apps Script**
+3. เปลี่ยนชื่อโครงการ Apps Script เป็น `OpenRAH01`
+4. ลบโค้ดเริ่มต้นใน `Code.gs` แล้ววางเนื้อหาจาก `Code.gs` ในโฟลเดอร์นี้
+5. สร้างไฟล์ `.gs` ที่เหลือ โดยใช้ชื่อไฟล์ให้ตรงกับรายการด้านล่างทุกตัวอักษร
+6. สร้างไฟล์ HTML ชื่อ `Index`, `Styles` และ `Scripts` แล้ววางเนื้อหาจากไฟล์ `.html` ที่ตรงกัน
+7. เปิด **การตั้งค่าโครงการ** เปิดการแสดงไฟล์ Manifest `appsscript.json` แล้วแทนที่เนื้อหาด้วยไฟล์จากโฟลเดอร์นี้
+8. เลือกฟังก์ชัน `setupRah01Production` จากเมนูฟังก์ชัน แล้วกด **Run** หนึ่งครั้ง จากนั้นอนุญาตสิทธิ์ Google Sheets, Google Drive และข้อมูลตัวตนตามที่ระบบร้องขอ ฟังก์ชันนี้เรียกซ้ำได้อย่างปลอดภัยและใช้เพิ่มส่วนตั้งค่าให้ template รุ่นเก่าได้
+9. เปิดแท็บ `Settings` แล้วเปลี่ยนค่าในช่องสีเหลือง `H4` ข้าง `hospital_name` เป็นชื่อทางการของโรงพยาบาล
+10. ตรวจรายการแผนกในแท็บ `Settings` ผู้ดูแลเพิ่มแถวต่อท้ายได้โดยไม่ติดเพดาน 150 แผนก แต่ชื่อ รหัส ลำดับ และ `department_id` ต้องไม่ซ้ำกัน และต้องตั้ง `active` เป็น `TRUE` จึงจะแสดงในแบบฟอร์ม
+11. ตรวจ Execution log หลังตั้งค่า และบันทึก Folder ID ของโฟลเดอร์เก็บรูปแนบส่วนตัวไว้
+12. ก่อนรับข้อมูลจริง ให้เรียก `clearBundledSyntheticData` หนึ่งครั้ง ระบบป้องกันจะไม่ยอมลบหากพบ assessment ID ที่ไม่ใช่ข้อมูลตัวอย่างของ template
+13. เลือก **Deploy → New deployment → Web app** ตั้งให้ทำงานด้วยบัญชีผู้ดูแลโรงพยาบาลผู้ deploy และจำกัดสิทธิ์เฉพาะโดเมน Google Workspace ของโรงพยาบาล
+14. เปิด URL ที่ลงท้ายด้วย `/exec` ตรวจว่าชื่อโรงพยาบาลแสดงใต้หัวข้อแบบประเมิน แล้วทดลองส่งข้อมูลที่ไม่ละเอียดอ่อนหนึ่งรายการ ตรวจข้อมูลในชีตปฏิบัติงานทั้งหกแท็บและโฟลเดอร์รูปแนบส่วนตัว
 
-## Required files
+## ไฟล์ที่ต้องมี
 
 - `Code.gs`
 - `Config.gs`
@@ -30,13 +31,15 @@ This directory is the copy-ready Google Apps Script package for the native Googl
 - `Scripts.html`
 - `appsscript.json`
 
-## Operational rules
+## หลักการใช้งานและความปลอดภัย
 
-- Never share the attachment folder publicly.
-- Do not give ordinary form users edit access to the database Sheet.
-- Keep the deployment restricted to the hospital domain.
-- Add administrators as Sheet editors separately.
-- Run a real pilot with non-sensitive test data before hospital rollout.
-- The browser payload stays `rah01-submission.v1`; attachment bytes use a separate transport argument.
-- `submitRah01Assessment` is retry-safe because the browser request UUID becomes the immutable assessment ID.
-- Server code recalculates every risk score and writes department/date/report snapshots into every child row.
+- ห้ามเปิดโฟลเดอร์รูปแนบเป็นสาธารณะ
+- ห้ามให้ผู้กรอกแบบฟอร์มทั่วไปมีสิทธิ์แก้ไข Google Sheets ฐานข้อมูล
+- จำกัด Web app ให้ใช้ได้เฉพาะโดเมนของโรงพยาบาล
+- เพิ่มผู้ดูแลเป็น Editor ของ Google Sheets แยกจากสิทธิ์ผู้กรอกแบบฟอร์ม
+- ทดลองระบบด้วยข้อมูลทดสอบที่ไม่ละเอียดอ่อนก่อนใช้งานจริง
+- ผู้ดูแลจัดการชื่อโรงพยาบาลและรายการแผนกผ่านแท็บ `Settings` ได้โดยไม่ต้องแก้โค้ด
+- เมื่อแก้ไฟล์ Apps Script ต้องสร้าง deployment เวอร์ชันใหม่ มิฉะนั้น URL `/exec` จะยังใช้โค้ดเวอร์ชันเดิม
+- โครงสร้างข้อมูลจากเบราว์เซอร์ยังคงเป็น `rah01-submission.v1` ส่วนข้อมูลไบต์ของรูปแนบส่งผ่าน argument แยกต่างหาก
+- `submitRah01Assessment` รองรับการส่งซ้ำอย่างปลอดภัย เพราะ request UUID จากเบราว์เซอร์ถูกใช้เป็น assessment ID ที่เปลี่ยนไม่ได้
+- ฝั่งเซิร์ฟเวอร์คำนวณคะแนนความเสี่ยงใหม่ทุกครั้ง และบันทึก snapshot ของชื่อแผนก วันที่ประเมิน และเลขที่รายงานไว้ในข้อมูลลูกทุกแถว
