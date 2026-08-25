@@ -1,35 +1,37 @@
 # OpenRAH01
 
-OpenRAH01 is an open-source, low-code implementation of the Thai RAH.01 occupational-health risk assessment for hospitals. Staff complete a guided web form, submissions are stored in Google Sheets through Apps Script, and administrators review results through a department-first dashboard.
+OpenRAH01 เป็นโครงการโอเพนซอร์สสำหรับนำแบบประเมินความเสี่ยงทางสุขภาพจากการทำงาน RAH.01 มาใช้ในโรงพยาบาล บุคลากรกรอกข้อมูลผ่านแบบฟอร์มบนเว็บ ระบบส่งข้อมูลไปเก็บใน Google Sheets ด้วย Apps Script ส่วนผู้ดูแลระบบสามารถตรวจผลโดยค้นหาและกรองตามชื่อแผนกได้ทันที
 
-## Preview
+ระบบใช้เครื่องมือของ Google ที่โรงพยาบาลมีอยู่แล้ว จึงไม่ต้องตั้งเซิร์ฟเวอร์หรือฐานข้อมูลเพิ่ม
 
-![OpenRAH01 hospital occupational-health risk assessment form](docs/images/openrah01-form.png)
+## ตัวอย่างหน้าจอ
 
-## Features
+![แบบประเมินความเสี่ยงทางสุขภาพ OpenRAH01 สำหรับโรงพยาบาล](docs/images/openrah01-form.png)
 
-- Five-section bilingual RAH.01 assessment form
-- Configurable hospital name and department catalog in Google Sheets
-- Ready for up to 70 hospital departments
-- Repeatable work-process and hazard-assessment rows
-- Automatic A × B risk scoring and LOW, MEDIUM, or HIGH classification
-- Image evidence uploads to a private Google Drive folder
-- Department-first database tables with human-readable labels
-- Administrator dashboard, workflow statuses, and audit log
-- Idempotent submissions and server-side validation
-- No paid backend, external database, or proprietary runtime required
+## ความสามารถของระบบ
 
-## Architecture
+- แบบประเมิน RAH.01 สองภาษา แบ่งเป็น 5 ส่วน
+- ตั้งชื่อโรงพยาบาลและรายการแผนกจาก Google Sheets ได้
+- รองรับแผนกในโรงพยาบาลได้สูงสุด 70 แผนก
+- เพิ่มขั้นตอนการทำงานและรายการสิ่งคุกคามได้ตามข้อมูลจริงของแต่ละแผนก
+- คำนวณคะแนนความเสี่ยง A × B และจัดระดับ ต่ำ ปานกลาง หรือสูงให้อัตโนมัติ
+- แนบรูปหลักฐานและเก็บไว้ในโฟลเดอร์ Google Drive แบบส่วนตัว
+- ตารางฐานข้อมูลแสดงชื่อแผนกและหัวข้อที่อ่านเข้าใจได้ ไม่ต้องไล่เทียบรหัส
+- มีหน้าแดชบอร์ดสำหรับผู้ดูแลระบบ สถานะงาน และประวัติการดำเนินการ
+- ป้องกันการบันทึกซ้ำ พร้อมตรวจสอบข้อมูลอีกครั้งที่ฝั่งเซิร์ฟเวอร์
+- ไม่ต้องซื้อระบบหลังบ้านหรือฐานข้อมูลภายนอกเพิ่ม
+
+## โครงสร้างระบบ
 
 ```text
-Browser form
+แบบฟอร์มในเว็บเบราว์เซอร์
     ↓
-Google Apps Script web app
+เว็บแอป Google Apps Script
     ↓
-Google Sheets database + private Google Drive attachments
+ฐานข้อมูล Google Sheets + รูปแนบใน Google Drive แบบส่วนตัว
 ```
 
-The workbook contains eight tabs:
+ไฟล์ฐานข้อมูลมี 8 แท็บ:
 
 1. `01 assessment`
 2. `02 OH system`
@@ -40,50 +42,48 @@ The workbook contains eight tabs:
 7. `Settings`
 8. `Admin Dashboard`
 
-## Deploy
+## วิธีติดตั้ง
 
-1. Upload `RAH01_Template.xlsx` to Google Drive and open it as a Google Sheet.
-2. Open **Extensions → Apps Script**.
-3. Copy the files from `AppsScript/` into the bound Apps Script project.
-4. Run `setupRah01Production` once and approve the requested permissions.
-5. In the `Settings` sheet, replace the yellow `hospital_name` value with the hospital's official name.
-6. Review the 70 departments and update their names, codes, status, and order as required.
-7. Run `clearBundledSyntheticData` before accepting real submissions.
-8. Deploy the Apps Script project as a web app restricted to the hospital's Google Workspace domain.
-9. Complete a controlled test submission and verify every operational sheet and the private attachment folder.
+1. อัปโหลด `RAH01_Template.xlsx` ไปยัง Google Drive แล้วเปิดเป็น Google Sheets
+2. เปิดเมนู **ส่วนขยาย → Apps Script**
+3. สร้างไฟล์ในโครงการ Apps Script แล้วคัดลอกเนื้อหาจากโฟลเดอร์ `AppsScript/` ไปวางให้ตรงกับชื่อไฟล์
+4. เลือกฟังก์ชัน `setupRah01Production` กด Run หนึ่งครั้ง และอนุญาตสิทธิ์ที่ระบบร้องขอ
+5. เปิดแท็บ `Settings` แล้วเปลี่ยนค่า `hospital_name` ในช่องสีเหลืองเป็นชื่อโรงพยาบาล
+6. ตรวจรายการ 70 แผนก จากนั้นแก้ชื่อ รหัส สถานะ และลำดับการแสดงผลให้ตรงกับโรงพยาบาล
+7. เรียกใช้ `clearBundledSyntheticData` เพื่อลบข้อมูลตัวอย่างก่อนเริ่มรับข้อมูลจริง
+8. Deploy โครงการ Apps Script เป็น Web app และจำกัดผู้ใช้ให้อยู่ในโดเมน Google Workspace ของโรงพยาบาล
+9. ทดลองส่งแบบประเมินหนึ่งรายการ แล้วตรวจข้อมูลในทุกแท็บรวมถึงโฟลเดอร์เก็บรูปแนบ
 
-Detailed instructions are available in [`AppsScript/README.md`](AppsScript/README.md).
+อ่านขั้นตอนแบบละเอียดได้ที่ [`AppsScript/README.md`](AppsScript/README.md)
 
-## Low-code administration
+## การตั้งค่าที่ผู้ดูแลแก้เองได้
 
-Hospital administrators manage the deployment from the `Settings` sheet:
+ผู้ดูแลโรงพยาบาลตั้งค่าระบบจากแท็บ `Settings` ได้โดยไม่ต้องแก้โค้ด:
 
-- `Settings!H4` controls the hospital name shown in the form.
-- `tblDepartments` controls department names, codes, active status, and display order.
-- Historical submissions preserve their submitted department name even if Settings changes later.
+- `Settings!H4` กำหนดชื่อโรงพยาบาลที่แสดงบนแบบฟอร์ม
+- `tblDepartments` กำหนดชื่อแผนก รหัส สถานะเปิดใช้งาน และลำดับการแสดงผล
+- ข้อมูลที่ส่งแล้วจะเก็บชื่อแผนก ณ วันที่ประเมินไว้ แม้ภายหลังผู้ดูแลจะเปลี่ยนชื่อแผนกใน `Settings`
 
-No source-code edit is required for these changes.
+## การดูแลข้อมูล
 
-## Data protection
+OpenRAH01 ใช้เก็บข้อมูลการประเมินด้านอาชีวอนามัย ก่อนเปิดใช้งานจริง โรงพยาบาลควรจัดการสิทธิ์และข้อมูลดังนี้:
 
-OpenRAH01 handles occupational-health assessment data. Production deployments must:
+- อนุญาตให้เฉพาะบุคลากรของโรงพยาบาลเข้าใช้เว็บแอป
+- จำกัดสิทธิ์ Google Sheets และโฟลเดอร์รูปแนบเฉพาะผู้เกี่ยวข้อง
+- ไม่บันทึกข้อมูลที่ระบุตัวผู้ป่วยได้
+- แยกสิทธิ์ผู้ดูแลระบบออกจากผู้กรอกแบบประเมินทั่วไป
+- ปฏิบัติตามนโยบายของโรงพยาบาลและกฎหมายคุ้มครองข้อมูลที่เกี่ยวข้อง
+- ทดลองระบบด้วยข้อมูลที่ไม่เป็นความลับก่อนเปิดใช้งานจริง
 
-- restrict the web app to authorized hospital users;
-- keep the database Sheet and attachment folder private;
-- avoid entering identifiable patient information;
-- assign administrators separately from ordinary form users;
-- follow applicable hospital policy and privacy law;
-- pilot with non-sensitive test data before rollout.
+โครงการนี้เป็นเครื่องมือช่วยจัดเก็บและทบทวนแบบประเมิน ไม่ใช่คำแนะนำทางการแพทย์หรือกฎหมาย
 
-This project provides software infrastructure, not medical or legal advice.
+## ไฟล์สำคัญในโครงการ
 
-## Project files
+- `rah01-form.html` แบบฟอร์มต้นฉบับสำหรับพัฒนาและเปิดดูในเครื่อง
+- `RAH01_Template.xlsx` แม่แบบฐานข้อมูลสำหรับนำเข้า Google Sheets
+- `AppsScript/` ระบบหลังบ้านและเว็บแอปที่เตรียมไว้สำหรับคัดลอกเข้า Apps Script
+- `assets/` ไฟล์รูปแบบการแสดงผล สคริปต์ ไอคอน และภาพประกอบของแต่ละส่วน
 
-- `rah01-form.html` — canonical local form and preview
-- `RAH01_Template.xlsx` — Google Sheets-ready database template
-- `AppsScript/` — copy-ready Apps Script backend and packaged web app
-- `assets/` — styles, scripts, icons, and section artwork
+## สัญญาอนุญาต
 
-## License
-
-Released under the [MIT License](LICENSE).
+เผยแพร่ภายใต้ [MIT License](LICENSE)
