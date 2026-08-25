@@ -1,8 +1,10 @@
 (function () {
   'use strict';
 
-  // Static preview mirror of the active rows in Settings > Departments.
+  // Static preview mirror of Settings > Departments. Only active rows reach the form.
   // Production Apps Script replaces this through getRah01FormConfig().
+  const MAX_DEPARTMENTS = 150;
+  const DEFAULT_ACTIVE_DEPARTMENTS = 70;
   const departmentNames = Object.freeze([
     ['หอผู้ป่วยหนัก 1', 'Intensive Care Unit 1'],
     ['หอผู้ป่วยหนัก 2', 'Intensive Care Unit 2'],
@@ -76,14 +78,19 @@
     ['หน่วยบริการปฐมภูมิ', 'Primary Care Unit']
   ]);
 
-  const departments = departmentNames.map(([nameTh, nameEn], index) => {
+  const reserveDepartmentNames = Array.from({ length: MAX_DEPARTMENTS - DEFAULT_ACTIVE_DEPARTMENTS }, (_, index) => {
+    const sequence = String(index + DEFAULT_ACTIVE_DEPARTMENTS + 1).padStart(3, '0');
+    return [`แผนกสำรอง ${sequence}`, `Reserved Department ${sequence}`];
+  });
+
+  const departments = [...departmentNames, ...reserveDepartmentNames].map(([nameTh, nameEn], index) => {
     const sequence = String(index + 1).padStart(3, '0');
     return Object.freeze({
       id: `DEPT-${sequence}`,
       code: `D${sequence}`,
       nameTh,
       nameEn,
-      active: true,
+      active: index < DEFAULT_ACTIVE_DEPARTMENTS,
       sortOrder: index + 1
     });
   });

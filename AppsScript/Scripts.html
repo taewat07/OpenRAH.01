@@ -65,6 +65,7 @@
 
   const SETTINGS_METHOD = 'getRah01FormConfig';
   const SUBMIT_METHOD = 'submitRah01Assessment';
+  const MAX_DEPARTMENTS = 150;
   let cachedConfig = null;
 
   function hasAppsScriptBridge() {
@@ -97,15 +98,17 @@
     const hospitalName = String(source?.hospitalName ?? source?.hospital_name ?? '').trim();
     if (!hospitalName) throw new Error('Hospital name is missing from Settings.');
     if (hospitalName.length > 200) throw new Error('Hospital name in Settings is too long.');
-    const departments = (source?.departments || [])
-      .map(normalizeDepartment)
-      .filter(department => department?.active)
-      .sort((left, right) => left.sortOrder - right.sortOrder || left.nameTh.localeCompare(right.nameTh, 'th'));
+    const sourceDepartments = source?.departments || [];
+    if (sourceDepartments.length > MAX_DEPARTMENTS) throw new Error(`Settings supports at most ${MAX_DEPARTMENTS} departments.`);
+    const normalizedDepartments = sourceDepartments.map(normalizeDepartment).filter(Boolean);
     const ids = new Set();
-    departments.forEach(department => {
+    normalizedDepartments.forEach(department => {
       if (ids.has(department.id)) throw new Error(`Duplicate department ID: ${department.id}`);
       ids.add(department.id);
     });
+    const departments = normalizedDepartments
+      .filter(department => department.active)
+      .sort((left, right) => left.sortOrder - right.sortOrder || left.nameTh.localeCompare(right.nameTh, 'th'));
     return Object.freeze({
       schemaVersion: String(source?.schemaVersion || 'rah01-form-config.v1'),
       hospitalName,

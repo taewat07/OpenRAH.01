@@ -112,16 +112,16 @@ function refreshRah01Dashboard_() {
 
   var sorted = assessments.slice().sort(function (left, right) {
     return String(left.department_name).localeCompare(String(right.department_name)) || new Date(right.assessment_date) - new Date(left.assessment_date) || String(left.assessment_id).localeCompare(String(right.assessment_id));
-  }).slice(0, 70);
-  var indexRows = Array.from({ length: 70 }, function (_, index) {
+  }).slice(0, RAH01_DASHBOARD_REVIEW_ROWS);
+  var indexRows = Array.from({ length: RAH01_DASHBOARD_REVIEW_ROWS }, function (_, index) {
     var row = sorted[index];
     if (!row) return [index + 1, '', '', '', '', '', '', '', ''];
     var score = Number(row.overall_risk_score);
     var action = score >= 6 ? 'Immediate corrective action' : score >= 3 ? 'Document improvement plan' : score ? 'Maintain controls' : '';
     return [index + 1, row.department_name, row.total_staff_count, row.status, row.overall_risk_score, row.overall_risk_level, row.assessment_date, row.report_number, action];
   });
-  dashboard.getRange('A10:I79').setValues(indexRows.map(function (row) { return row.map(safeCellValue_); }));
-  dashboard.getRange('T10:T79').setValues(Array.from({ length: 70 }, function (_, index) { return [safeCellValue_(sorted[index] ? sorted[index].assessment_id : '')]; }));
+  dashboard.getRange(10, 1, RAH01_DASHBOARD_REVIEW_ROWS, 9).setValues(indexRows.map(function (row) { return row.map(safeCellValue_); }));
+  dashboard.getRange(10, 20, RAH01_DASHBOARD_REVIEW_ROWS, 1).setValues(Array.from({ length: RAH01_DASHBOARD_REVIEW_ROWS }, function (_, index) { return [safeCellValue_(sorted[index] ? sorted[index].assessment_id : '')]; }));
 
   var categoryCodes = ['PHYSICAL', 'BIOLOGICAL', 'CHEMICAL', 'ERGONOMIC', 'SAFETY_ACCIDENT', 'FIRE_DISASTER', 'PSYCHOSOCIAL', 'INDOOR_AIR_QUALITY'];
   dashboard.getRange('O4:O11').setValues(categoryCodes.map(function (code) { return [hazards.filter(function (row) { return row.category_code === code && asBoolean_(row.has_risk); }).length]; }));
@@ -137,6 +137,12 @@ function integerInRange_(value, label, minimum, maximum) { var number = Number(v
 function positiveInteger_(value, label) { return integerInRange_(value, label, 1, 1000000); }
 function nonnegativeInteger_(value, label) { return integerInRange_(value, label, 0, 1000000); }
 function asBoolean_(value) { return value === true || value === 1 || String(value).toUpperCase() === 'TRUE' || String(value).toUpperCase() === 'ACTIVE'; }
+function settingsBoolean_(value, label) {
+  var normalized = String(value).trim().toUpperCase();
+  if (value === true || value === 1 || normalized === 'TRUE' || normalized === 'ACTIVE') return true;
+  if (value === false || value === 0 || normalized === 'FALSE' || normalized === 'INACTIVE') return false;
+  throw new Error(label + ' must be TRUE or FALSE.');
+}
 function safeCellValue_(value) {
   if (typeof value !== 'string') return value;
   return /^[=+\-@]/.test(value) ? "'" + value : value;

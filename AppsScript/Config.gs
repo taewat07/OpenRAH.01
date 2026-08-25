@@ -2,6 +2,8 @@ var RAH01_HEADER_ROW = 3;
 var RAH01_DATA_ROW = 4;
 var RAH01_MAX_ATTACHMENT_BYTES = 5 * 1024 * 1024;
 var RAH01_MAX_TOTAL_ATTACHMENT_BYTES = 15 * 1024 * 1024;
+var RAH01_MAX_DEPARTMENTS = 150;
+var RAH01_DASHBOARD_REVIEW_ROWS = 150;
 
 var RAH01_PROPERTY_KEYS = Object.freeze({
   SPREADSHEET_ID: 'RAH01_SPREADSHEET_ID',
@@ -34,27 +36,35 @@ function getRah01FormConfig() {
   var settings = getRah01SettingValues_(settingsSheet);
   var hospitalName = requiredText_(boundedText_(settings.hospital_name, 'Settings hospital_name', 200), 'Settings hospital_name');
   var rows = readSheetObjects_(settingsSheet);
-  var departments = rows.filter(function (row) {
-    return asBoolean_(row.active);
-  }).map(function (row) {
+  if (rows.length > RAH01_MAX_DEPARTMENTS) throw new Error('Settings supports at most ' + RAH01_MAX_DEPARTMENTS + ' departments.');
+  var ids = {};
+  var codes = {};
+  var sortOrders = {};
+  var normalized = rows.map(function (row) {
     var departmentName = requiredText_(row.department_name, 'Settings department_name');
+    var id = requiredText_(row.department_id, 'Settings department_id');
+    var code = requiredText_(row.department_code, 'Settings department_code');
+    var sortOrder = positiveInteger_(row.sort_order, 'Settings sort_order');
+    if (ids[id]) throw new Error('Duplicate department ID: ' + id);
+    if (codes[code]) throw new Error('Duplicate department code: ' + code);
+    if (sortOrders[sortOrder]) throw new Error('Duplicate department sort_order: ' + sortOrder);
+    ids[id] = true;
+    codes[code] = true;
+    sortOrders[sortOrder] = true;
     return {
-      id: requiredText_(row.department_id, 'Settings department_id'),
-      code: requiredText_(row.department_code, 'Settings department_code'),
+      id: id,
+      code: code,
       name: departmentName,
       nameTh: departmentName,
       nameEn: '',
-      active: true,
-      sortOrder: positiveInteger_(row.sort_order, 'Settings sort_order')
+      active: settingsBoolean_(row.active, 'Settings active'),
+      sortOrder: sortOrder
     };
+  });
+  var departments = normalized.filter(function (department) {
+    return department.active;
   }).sort(function (left, right) {
     return left.sortOrder - right.sortOrder || left.name.localeCompare(right.name);
-  });
-
-  var ids = {};
-  departments.forEach(function (department) {
-    if (ids[department.id]) throw new Error('Duplicate active department ID: ' + department.id);
-    ids[department.id] = true;
   });
   return { schemaVersion: 'rah01-form-config.v1', hospitalName: hospitalName, departments: departments };
 }
