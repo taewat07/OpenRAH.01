@@ -65,7 +65,6 @@
 
   const SETTINGS_METHOD = 'getRah01FormConfig';
   const SUBMIT_METHOD = 'submitRah01Assessment';
-  const MAX_DEPARTMENTS = 150;
   let cachedConfig = null;
 
   function hasAppsScriptBridge() {
@@ -99,7 +98,6 @@
     if (!hospitalName) throw new Error('Hospital name is missing from Settings.');
     if (hospitalName.length > 200) throw new Error('Hospital name in Settings is too long.');
     const sourceDepartments = source?.departments || [];
-    if (sourceDepartments.length > MAX_DEPARTMENTS) throw new Error(`Settings supports at most ${MAX_DEPARTMENTS} departments.`);
     const normalizedDepartments = sourceDepartments.map(normalizeDepartment).filter(Boolean);
     const ids = new Set();
     normalizedDepartments.forEach(department => {

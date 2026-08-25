@@ -3,7 +3,7 @@
 
   // Static preview mirror of Settings > Departments. Only active rows reach the form.
   // Production Apps Script replaces this through getRah01FormConfig().
-  const MAX_DEPARTMENTS = 150;
+  const TEMPLATE_DEPARTMENT_ROWS = 150;
   const DEFAULT_ACTIVE_DEPARTMENTS = 70;
   const departmentNames = Object.freeze([
     ['หอผู้ป่วยหนัก 1', 'Intensive Care Unit 1'],
@@ -78,7 +78,7 @@
     ['หน่วยบริการปฐมภูมิ', 'Primary Care Unit']
   ]);
 
-  const reserveDepartmentNames = Array.from({ length: MAX_DEPARTMENTS - DEFAULT_ACTIVE_DEPARTMENTS }, (_, index) => {
+  const reserveDepartmentNames = Array.from({ length: TEMPLATE_DEPARTMENT_ROWS - DEFAULT_ACTIVE_DEPARTMENTS }, (_, index) => {
     const sequence = String(index + DEFAULT_ACTIVE_DEPARTMENTS + 1).padStart(3, '0');
     return [`แผนกสำรอง ${sequence}`, `Reserved Department ${sequence}`];
   });

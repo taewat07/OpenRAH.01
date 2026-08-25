@@ -2,8 +2,8 @@ var RAH01_HEADER_ROW = 3;
 var RAH01_DATA_ROW = 4;
 var RAH01_MAX_ATTACHMENT_BYTES = 5 * 1024 * 1024;
 var RAH01_MAX_TOTAL_ATTACHMENT_BYTES = 15 * 1024 * 1024;
-var RAH01_MAX_DEPARTMENTS = 150;
-var RAH01_DASHBOARD_REVIEW_ROWS = 150;
+var RAH01_DASHBOARD_MIN_REVIEW_ROWS = 150;
+var RAH01_DASHBOARD_FIRST_REVIEW_ROW = 10;
 
 var RAH01_PROPERTY_KEYS = Object.freeze({
   SPREADSHEET_ID: 'RAH01_SPREADSHEET_ID',
@@ -36,7 +36,6 @@ function getRah01FormConfig() {
   var settings = getRah01SettingValues_(settingsSheet);
   var hospitalName = requiredText_(boundedText_(settings.hospital_name, 'Settings hospital_name', 200), 'Settings hospital_name');
   var rows = readSheetObjects_(settingsSheet);
-  if (rows.length > RAH01_MAX_DEPARTMENTS) throw new Error('Settings supports at most ' + RAH01_MAX_DEPARTMENTS + ' departments.');
   var ids = {};
   var codes = {};
   var sortOrders = {};

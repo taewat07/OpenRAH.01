@@ -112,16 +112,17 @@ function refreshRah01Dashboard_() {
 
   var sorted = assessments.slice().sort(function (left, right) {
     return String(left.department_name).localeCompare(String(right.department_name)) || new Date(right.assessment_date) - new Date(left.assessment_date) || String(left.assessment_id).localeCompare(String(right.assessment_id));
-  }).slice(0, RAH01_DASHBOARD_REVIEW_ROWS);
-  var indexRows = Array.from({ length: RAH01_DASHBOARD_REVIEW_ROWS }, function (_, index) {
+  });
+  var reviewCapacity = ensureRah01DashboardReviewCapacity_(dashboard, sorted.length);
+  var indexRows = Array.from({ length: reviewCapacity }, function (_, index) {
     var row = sorted[index];
     if (!row) return [index + 1, '', '', '', '', '', '', '', ''];
     var score = Number(row.overall_risk_score);
     var action = score >= 6 ? 'Immediate corrective action' : score >= 3 ? 'Document improvement plan' : score ? 'Maintain controls' : '';
     return [index + 1, row.department_name, row.total_staff_count, row.status, row.overall_risk_score, row.overall_risk_level, row.assessment_date, row.report_number, action];
   });
-  dashboard.getRange(10, 1, RAH01_DASHBOARD_REVIEW_ROWS, 9).setValues(indexRows.map(function (row) { return row.map(safeCellValue_); }));
-  dashboard.getRange(10, 20, RAH01_DASHBOARD_REVIEW_ROWS, 1).setValues(Array.from({ length: RAH01_DASHBOARD_REVIEW_ROWS }, function (_, index) { return [safeCellValue_(sorted[index] ? sorted[index].assessment_id : '')]; }));
+  dashboard.getRange(RAH01_DASHBOARD_FIRST_REVIEW_ROW, 1, reviewCapacity, 9).setValues(indexRows.map(function (row) { return row.map(safeCellValue_); }));
+  dashboard.getRange(RAH01_DASHBOARD_FIRST_REVIEW_ROW, 20, reviewCapacity, 1).setValues(Array.from({ length: reviewCapacity }, function (_, index) { return [safeCellValue_(sorted[index] ? sorted[index].assessment_id : '')]; }));
 
   var categoryCodes = ['PHYSICAL', 'BIOLOGICAL', 'CHEMICAL', 'ERGONOMIC', 'SAFETY_ACCIDENT', 'FIRE_DISASTER', 'PSYCHOSOCIAL', 'INDOOR_AIR_QUALITY'];
   dashboard.getRange('O4:O11').setValues(categoryCodes.map(function (code) { return [hazards.filter(function (row) { return row.category_code === code && asBoolean_(row.has_risk); }).length]; }));
@@ -129,6 +130,27 @@ function refreshRah01Dashboard_() {
   dashboard.getRange('Q4:R7').setValues(Array.from({ length: 4 }, function (_, index) {
     return (top[index] ? [top[index].department_name, top[index].overall_risk_score] : ['', '']).map(safeCellValue_);
   }));
+}
+
+function ensureRah01DashboardReviewCapacity_(dashboard, requiredRows) {
+  var storedCapacity = Number(dashboard.getRange('U4').getValue());
+  var capacity = Number.isInteger(storedCapacity) && storedCapacity >= RAH01_DASHBOARD_MIN_REVIEW_ROWS
+    ? storedCapacity
+    : RAH01_DASHBOARD_MIN_REVIEW_ROWS;
+  if (requiredRows <= capacity) {
+    dashboard.getRange('U4').setValue(capacity);
+    return capacity;
+  }
+  var additionalRows = requiredRows - capacity;
+  var currentLastRow = RAH01_DASHBOARD_FIRST_REVIEW_ROW + capacity - 1;
+  dashboard.insertRowsAfter(currentLastRow, additionalRows);
+  dashboard.getRange(currentLastRow, 1, 1, 9).copyTo(
+    dashboard.getRange(currentLastRow + 1, 1, additionalRows, 9),
+    SpreadsheetApp.CopyPasteType.PASTE_FORMAT,
+    false
+  );
+  dashboard.getRange('U4').setValue(requiredRows);
+  return requiredRows;
 }
 
 function requiredText_(value, label) { var text = String(value === undefined || value === null ? '' : value).trim(); if (!text) throw new Error(label + ' is required.'); return text; }
