@@ -319,7 +319,7 @@
           <div class="mini-field step-hazards"><label>สิ่งคุกคามหลัก</label><textarea data-field="hazards" placeholder="เช่น สารเคมี HCl" required>${escapeHtml(step.hazards)}</textarea></div>
         </div>
         <div class="step-meta-fields">
-          <div class="mini-field duration"><label>ระยะเวลาต่อครั้ง/กะ</label><input data-field="duration" value="${escapeHtml(step.duration)}" placeholder="เช่น 30 นาที/ครั้ง หรือ 8 ชั่วโมง/กะ" required></div>
+          <div class="mini-field duration"><label>ระยะเวลาการทำงาน</label><input data-field="duration" value="${escapeHtml(step.duration)}" placeholder="เช่น 4 ชั่วโมง, 30 นาที" required></div>
           <div class="mini-field staff"><label>จำนวนคน</label><input data-field="staff" type="number" min="1" value="${escapeHtml(step.staff)}" placeholder="ระบุจำนวน" required></div>
         </div>
         <button class="icon-button remove" type="button" aria-label="ลบขั้นตอน" title="ลบขั้นตอน">×</button>
@@ -802,8 +802,7 @@
         },
         checklist: checklistItems.map(item => ({
           itemKey: item.key,
-          status: state.checklist[item.key]?.status || null,
-          notApplicableReason: null
+          status: state.checklist[item.key]?.status || null
         })),
         workSteps: state.steps.map((step, index) => ({
           order: index + 1,
@@ -823,7 +822,6 @@
           exposureScoreA: row.data.hasExposure ? Number(row.data.a) : null,
           severityScoreB: row.data.hasExposure ? Number(row.data.b) : null,
           existingControls: row.data.hasExposure ? String(row.data.controls || '').trim() : '',
-          recommendation: '',
           evidenceAttachment: row.data.hasExposure && row.data.attachment ? {
             name: row.data.attachment.name,
             mimeType: row.data.attachment.mimeType,

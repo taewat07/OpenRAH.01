@@ -15,8 +15,10 @@ function setupRah01Production() {
 
   PropertiesService.getScriptProperties().setProperty(RAH01_PROPERTY_KEYS.SPREADSHEET_ID, spreadsheet.getId());
   ensureRah01FormConfiguration_(spreadsheet);
+  removeRah01DeadColumns_(spreadsheet);
   ensureRah01HazardExposureColumn_(spreadsheet);
   validateRah01Workbook_(spreadsheet);
+  installRah01OperationalFormulas_(spreadsheet);
 
   var folderId = PropertiesService.getScriptProperties().getProperty(RAH01_PROPERTY_KEYS.ATTACHMENT_FOLDER_ID);
   var folder = folderId ? getFolderIfAvailable_(folderId) : null;
@@ -25,7 +27,7 @@ function setupRah01Production() {
     PropertiesService.getScriptProperties().setProperty(RAH01_PROPERTY_KEYS.ATTACHMENT_FOLDER_ID, folder.getId());
   }
 
-  refreshRah01Dashboard_();
+  refreshRah01Dashboard_(true);
   return {
     ok: true,
     spreadsheetId: spreadsheet.getId(),
@@ -33,6 +35,28 @@ function setupRah01Production() {
     attachmentFolderId: folder.getId(),
     attachmentFolderName: folder.getName()
   };
+}
+
+function removeRah01DeadColumns_(spreadsheet) {
+  var checklistLegacy = RAH01_HEADERS[RAH01_SHEETS.CHECKLIST].slice();
+  checklistLegacy.splice(6, 0, 'not_applicable_reason');
+  var hazardLegacyWithExposure = RAH01_HEADERS[RAH01_SHEETS.HAZARDS].slice();
+  hazardLegacyWithExposure.splice(13, 0, 'recommendation');
+  var hazardLegacyWithoutExposure = hazardLegacyWithExposure.slice(0, -1);
+  [
+    { sheetName: RAH01_SHEETS.CHECKLIST, header: 'not_applicable_reason', layouts: [checklistLegacy] },
+    { sheetName: RAH01_SHEETS.HAZARDS, header: 'recommendation', layouts: [hazardLegacyWithExposure, hazardLegacyWithoutExposure] }
+  ].forEach(function (definition) {
+    var sheet = spreadsheet.getSheetByName(definition.sheetName);
+    if (!sheet) throw new Error('Missing required sheet: ' + definition.sheetName);
+    var headers = sheet.getRange(RAH01_HEADER_ROW, 1, 1, sheet.getLastColumn()).getDisplayValues()[0].map(function (value) {
+      return String(value || '').trim();
+    });
+    var legacyLayout = definition.layouts.find(function (layout) {
+      return JSON.stringify(headers) === JSON.stringify(layout);
+    });
+    if (legacyLayout) sheet.deleteColumn(legacyLayout.indexOf(definition.header) + 1);
+  });
 }
 
 function ensureRah01HazardExposureColumn_(spreadsheet) {

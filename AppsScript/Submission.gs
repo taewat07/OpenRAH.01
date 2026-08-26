@@ -41,7 +41,6 @@ function submitRah01Assessment(payload, requestId, attachmentTransports) {
           risk_score_c: hazard.riskScore,
           risk_level: hazard.riskLevel,
           existing_controls: hazard.existingControls,
-          recommendation: hazard.recommendation,
           has_attachment: Boolean(file),
           category_code: hazard.categoryCode,
           hazard_key: hazard.hazardKey,
@@ -81,7 +80,6 @@ function submitRah01Assessment(payload, requestId, attachmentTransports) {
           item_order: index + 1,
           item_label_en: RAH01_CHECKLIST[item.itemKey].label,
           status: item.status,
-          not_applicable_reason: item.notApplicableReason || '',
           item_key: item.itemKey,
           checklist_response_id: 'CHK-' + cleanRequestId + '-' + String(index + 1).padStart(2, '0')
         });
@@ -182,9 +180,7 @@ function validateSubmission_(payload, attachmentTransports) {
     seenChecklist[key] = true;
     var status = requiredText_(item.status, 'Checklist status');
     if (['YES', 'NO'].indexOf(status) < 0) throw new Error('Checklist status must be YES or NO for ' + key + '.');
-    var reason = boundedText_(item.notApplicableReason, 'N/A reason', 1000);
-    if (reason) throw new Error('N/A reason is no longer accepted for this checklist.');
-    return { itemKey: key, status: status, notApplicableReason: '' };
+    return { itemKey: key, status: status };
   });
 
   var workSteps = Array.isArray(payload.workSteps) ? payload.workSteps : [];
@@ -195,7 +191,7 @@ function validateSubmission_(payload, attachmentTransports) {
       order: index + 1,
       workStep: requiredText_(boundedText_(step.workStep, 'Work step', 2000), 'Work step'),
       primaryHazards: requiredText_(boundedText_(step.primaryHazards, 'Primary hazards', 2000), 'Primary hazards'),
-      workDuration: requiredText_(boundedText_(step.workDuration, 'Work duration', 500), 'Work duration'),
+      workDuration: requiredText_(boundedText_(step.workDuration, 'ระยะเวลาการทำงาน', 500), 'ระยะเวลาการทำงาน'),
       staffInvolvedCount: positiveInteger_(step.staffInvolvedCount, 'Staff involved')
     };
   });
@@ -220,7 +216,6 @@ function validateSubmission_(payload, attachmentTransports) {
     var a = hasExposure ? integerInRange_(hazard.exposureScoreA, 'Exposure score A', 1, 3) : '';
     var b = hasExposure ? integerInRange_(hazard.severityScoreB, 'Severity score B', 1, 3) : '';
     var score = hasExposure ? a * b : '';
-    var recommendation = boundedText_(hazard.recommendation, 'Recommendation', 5000);
     var attachment = hazard.evidenceAttachment || null;
     var transport = attachmentTransports[index] || null;
     if (!hasExposure && attachment) throw new Error('Hazards without exposed people cannot include risk evidence.');
@@ -250,7 +245,6 @@ function validateSubmission_(payload, attachmentTransports) {
       riskScore: score,
       riskLevel: hasExposure ? riskLevel_(score) : '',
       existingControls: hasExposure ? boundedText_(hazard.existingControls, 'Existing controls', 5000) : '',
-      recommendation: recommendation,
       evidenceAttachment: attachment
     };
   });

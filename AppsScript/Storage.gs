@@ -59,8 +59,55 @@ function appendObjects_(sheet, objects) {
       return safeCellValue_(object[header] === undefined ? '' : object[header]);
     });
   });
-  sheet.getRange(startRow, 1, rows.length, headers.length).setValues(rows);
-  return { sheet: sheet, startRow: startRow, rowCount: rows.length };
+  var append = { sheet: sheet, startRow: startRow, rowCount: rows.length };
+  try {
+    sheet.getRange(startRow, 1, rows.length, headers.length).setValues(rows);
+    installRah01DerivedFormulasForRows_(sheet, startRow, rows.length);
+    return append;
+  } catch (error) {
+    sheet.getRange(startRow, 1, rows.length, sheet.getLastColumn()).clearContent();
+    throw error;
+  }
+}
+
+function installRah01OperationalFormulas_(spreadsheet) {
+  [RAH01_SHEETS.ASSESSMENTS, RAH01_SHEETS.HAZARDS].forEach(function (sheetName) {
+    var sheet = spreadsheet.getSheetByName(sheetName);
+    if (!sheet) throw new Error('Missing required sheet: ' + sheetName);
+    var lastRow = sheet.getLastRow();
+    if (lastRow >= RAH01_DATA_ROW) installRah01DerivedFormulasForRows_(sheet, RAH01_DATA_ROW, lastRow - RAH01_DATA_ROW + 1);
+  });
+}
+
+function rah01AssessmentRiskFormula_(row) {
+  var criteria = '\'04 Hazards\'!$S$4:$S,M' + row + ',\'04 Hazards\'!$R$4:$R,TRUE,\'04 Hazards\'!$U$4:$U,TRUE';
+  var scoreRange = '\'04 Hazards\'!$K$4:$K';
+  function countAtLeast(score) { return 'COUNTIFS(' + criteria + ',' + scoreRange + ',">=' + score + '")'; }
+  return '=IF(M' + row + '="","",IF(' + countAtLeast(1) + '=0,"",IF(' + countAtLeast(9) + '>0,9,IF(' + countAtLeast(6) + '>0,6,IF(' + countAtLeast(4) + '>0,4,IF(' + countAtLeast(3) + '>0,3,IF(' + countAtLeast(2) + '>0,2,1)))))))';
+}
+
+function installRah01DerivedFormulasForRows_(sheet, startRow, rowCount) {
+  if (!rowCount) return;
+  var sheetName = sheet.getName();
+  if (sheetName === RAH01_SHEETS.ASSESSMENTS) {
+    sheet.getRange(startRow, 7, rowCount, 1).setFormulas(Array.from({ length: rowCount }, function (_, index) {
+      var row = startRow + index;
+      return [rah01AssessmentRiskFormula_(row)];
+    }));
+    sheet.getRange(startRow, 8, rowCount, 1).setFormulas(Array.from({ length: rowCount }, function (_, index) {
+      var row = startRow + index;
+      return ['=IF(G' + row + '="","",IF(G' + row + '<=2,"LOW",IF(G' + row + '<=4,"MEDIUM","HIGH")))'];
+    }));
+  } else if (sheetName === RAH01_SHEETS.HAZARDS) {
+    sheet.getRange(startRow, 11, rowCount, 1).setFormulas(Array.from({ length: rowCount }, function (_, index) {
+      var row = startRow + index;
+      return ['=IF(AND(R' + row + '=TRUE,U' + row + '=TRUE,ISNUMBER(I' + row + '),I' + row + '=INT(I' + row + '),I' + row + '>=1,I' + row + '<=3,ISNUMBER(J' + row + '),J' + row + '=INT(J' + row + '),J' + row + '>=1,J' + row + '<=3),I' + row + '*J' + row + ',"")'];
+    }));
+    sheet.getRange(startRow, 12, rowCount, 1).setFormulas(Array.from({ length: rowCount }, function (_, index) {
+      var row = startRow + index;
+      return ['=IF(K' + row + '="","",IF(K' + row + '<=2,"LOW",IF(K' + row + '<=4,"MEDIUM","HIGH")))'];
+    }));
+  }
 }
 
 function rollbackAppends_(appends) {
@@ -99,37 +146,155 @@ function saveAttachment_(rootFolder, reportNumber, hazardId, attachment, fileTra
   return file;
 }
 
-function refreshRah01Dashboard_() {
+function refreshRah01Dashboard_(forceChartRebuild) {
   var spreadsheet = getRah01Spreadsheet_();
   var dashboard = spreadsheet.getSheetByName(RAH01_SHEETS.DASHBOARD);
   if (!dashboard) return;
   var assessments = readSheetObjects_(spreadsheet.getSheetByName(RAH01_SHEETS.ASSESSMENTS));
-  var hazards = readSheetObjects_(spreadsheet.getSheetByName(RAH01_SHEETS.HAZARDS));
-  dashboard.getRange('A5').setValue(assessments.length);
-  dashboard.getRange('D5').setValue(assessments.filter(function (row) { return row.status === 'SUBMITTED'; }).length);
-  dashboard.getRange('G5').setValue(assessments.filter(function (row) { return row.status === 'IN_REVIEW'; }).length);
-  dashboard.getRange('J5').setValue(assessments.filter(function (row) { return Number(row.overall_risk_score) >= 6 && Number(row.overall_risk_score) <= 9; }).length);
+  var reviewCapacity = ensureRah01DashboardReviewCapacity_(dashboard, assessments.length);
+  installRah01DashboardFormulas_(dashboard, reviewCapacity);
+  SpreadsheetApp.flush();
+  ensureRah01DashboardCharts_(dashboard, forceChartRebuild === true);
+  SpreadsheetApp.flush();
+}
 
-  var sorted = assessments.slice().sort(function (left, right) {
-    return String(left.department_name).localeCompare(String(right.department_name)) || new Date(right.assessment_date) - new Date(left.assessment_date) || String(left.assessment_id).localeCompare(String(right.assessment_id));
-  });
-  var reviewCapacity = ensureRah01DashboardReviewCapacity_(dashboard, sorted.length);
-  var indexRows = Array.from({ length: reviewCapacity }, function (_, index) {
-    var row = sorted[index];
-    if (!row) return [index + 1, '', '', '', '', '', '', '', ''];
-    var score = Number(row.overall_risk_score);
-    var action = score >= 6 ? 'Immediate corrective action' : score >= 3 ? 'Document improvement plan' : score ? 'Maintain controls' : '';
-    return [index + 1, row.department_name, row.total_staff_count, row.status, row.overall_risk_score, row.overall_risk_level, row.assessment_date, row.report_number, action];
-  });
-  dashboard.getRange(RAH01_DASHBOARD_FIRST_REVIEW_ROW, 1, reviewCapacity, 9).setValues(indexRows.map(function (row) { return row.map(safeCellValue_); }));
-  dashboard.getRange(RAH01_DASHBOARD_FIRST_REVIEW_ROW, 20, reviewCapacity, 1).setValues(Array.from({ length: reviewCapacity }, function (_, index) { return [safeCellValue_(sorted[index] ? sorted[index].assessment_id : '')]; }));
+function installRah01DashboardFormulas_(dashboard, reviewCapacity) {
+  if (dashboard.getMaxColumns() < 36) dashboard.insertColumnsAfter(dashboard.getMaxColumns(), 36 - dashboard.getMaxColumns());
+  dashboard.getRange('A5').setFormula("=COUNTIF('01 assessment'!M4:M,\"<>\")");
+  dashboard.getRange('D5').setFormula("=COUNTIF('01 assessment'!C4:C,\"SUBMITTED\")");
+  dashboard.getRange('G5').setFormula("=COUNTIF('01 assessment'!C4:C,\"IN_REVIEW\")");
+  dashboard.getRange('J5').setFormula("=COUNTIFS('01 assessment'!G4:G,\">=6\",'01 assessment'!G4:G,\"<=9\")");
 
-  var categoryCodes = ['PHYSICAL', 'BIOLOGICAL', 'CHEMICAL', 'ERGONOMIC', 'PSYCHOSOCIAL', 'SAFETY_ACCIDENT', 'FIRE_DISASTER', 'INDOOR_AIR_QUALITY'];
-  dashboard.getRange('O4:O11').setValues(categoryCodes.map(function (code) { return [hazards.filter(function (row) { return row.category_code === code && asBoolean_(row.has_risk); }).length]; }));
-  var top = assessments.slice().sort(function (left, right) { return Number(right.overall_risk_score) - Number(left.overall_risk_score) || String(left.department_name).localeCompare(String(right.department_name)); }).slice(0, 4);
-  dashboard.getRange('Q4:R7').setValues(Array.from({ length: 4 }, function (_, index) {
-    return (top[index] ? [top[index].department_name, top[index].overall_risk_score] : ['', '']).map(safeCellValue_);
+  var firstRow = RAH01_DASHBOARD_FIRST_REVIEW_ROW;
+  dashboard.getRange('W4:AD' + dashboard.getMaxRows()).clearContent();
+  dashboard.getRange('W4').setFormula("=IFERROR(SORT(FILTER({'01 assessment'!A4:A,'01 assessment'!F4:F,'01 assessment'!C4:C,'01 assessment'!G4:G,'01 assessment'!H4:H,'01 assessment'!B4:B,'01 assessment'!I4:I,'01 assessment'!M4:M},'01 assessment'!M4:M<>\"\"),1,TRUE,6,FALSE,8,TRUE),\"\")");
+  dashboard.getRange(firstRow, 1, reviewCapacity, 1).setValues(Array.from({ length: reviewCapacity }, function (_, index) { return [index + 1]; }));
+  dashboard.getRange(firstRow, 2, reviewCapacity, 7).setFormulas(Array.from({ length: reviewCapacity }, function (_, index) {
+    var row = firstRow + index;
+    return Array.from({ length: 7 }, function (_, column) {
+      return '=IFERROR(INDEX($W$4:$AD,$A' + row + ',' + (column + 1) + '),\"\")';
+    });
   }));
+  dashboard.getRange(firstRow, 9, reviewCapacity, 1).setFormulas(Array.from({ length: reviewCapacity }, function (_, index) {
+    var row = firstRow + index;
+    return ['=IF(E' + row + '=\"\",\"\",IF(E' + row + '>=6,\"Immediate corrective action\",IF(E' + row + '>=3,\"Document improvement plan\",\"Maintain controls\")))'];
+  }));
+  dashboard.getRange(firstRow, 20, reviewCapacity, 1).setFormulas(Array.from({ length: reviewCapacity }, function (_, index) {
+    var row = firstRow + index;
+    return ['=IFERROR(INDEX($W$4:$AD,$A' + row + ',8),\"\")'];
+  }));
+
+  var formulaLastRow = RAH01_DASHBOARD_FORMULA_LAST_ROW;
+  var categoryRows = [
+    ['Biological', 'BIOLOGICAL'], ['Chemical', 'CHEMICAL'], ['Ergonomic', 'ERGONOMIC'],
+    ['Fire / disaster', 'FIRE_DISASTER'], ['Indoor air', 'INDOOR_AIR_QUALITY'], ['Physical', 'PHYSICAL'],
+    ['Psychosocial', 'PSYCHOSOCIAL'], ['Safety / accident', 'SAFETY_ACCIDENT']
+  ];
+  dashboard.getRange('N3:O3').setValues([['category_code', 'hazard_count']]);
+  dashboard.getRange('N4:N11').setValues(categoryRows.map(function (row) { return [row[0]]; }));
+  dashboard.getRange('O4:O11').setFormulas(categoryRows.map(function (row) {
+    return ['=SUMPRODUCT((\'04 Hazards\'!$O$4:$O$' + formulaLastRow + '=\"' + row[1] + '\")*(\'04 Hazards\'!$R$4:$R$' + formulaLastRow + '=TRUE))'];
+  }));
+
+  var helperRowCount = formulaLastRow - 3;
+  dashboard.getRange('AG3:AJ3').setValues([['latest_department_assessment_rank', 'latest_assessment_total_risk', 'top_risk_rank', 'review_sort_rank']]);
+  dashboard.getRange('AG4:AG' + formulaLastRow).setFormulas(Array.from({ length: helperRowCount }, function (_, index) {
+    var row = index + 4;
+    return [`=IF('01 assessment'!$M${row}="","",1+COUNTIFS('01 assessment'!$L$4:$L$${formulaLastRow},'01 assessment'!$L${row},'01 assessment'!$J$4:$J$${formulaLastRow},">"&'01 assessment'!$J${row})+COUNTIFS('01 assessment'!$L$4:$L$${formulaLastRow},'01 assessment'!$L${row},'01 assessment'!$J$4:$J$${formulaLastRow},'01 assessment'!$J${row},'01 assessment'!$M$4:$M$${formulaLastRow},"<"&'01 assessment'!$M${row}))`];
+  }));
+  dashboard.getRange('AH4:AH' + formulaLastRow).setFormulas(Array.from({ length: helperRowCount }, function (_, index) {
+    var row = index + 4;
+    return [`=IF(OR($AG${row}<>1,'01 assessment'!$M${row}=""),"",SUMIFS('04 Hazards'!$K$4:$K$${formulaLastRow},'04 Hazards'!$S$4:$S$${formulaLastRow},'01 assessment'!$M${row},'04 Hazards'!$R$4:$R$${formulaLastRow},TRUE,'04 Hazards'!$U$4:$U$${formulaLastRow},TRUE))`];
+  }));
+  dashboard.getRange('AI4:AI' + formulaLastRow).setFormulas(Array.from({ length: helperRowCount }, function (_, index) {
+    var row = index + 4;
+    return [`=IF(OR($AG${row}<>1,$AH${row}<=0),"",1+COUNTIFS($AG$4:$AG$${formulaLastRow},1,$AH$4:$AH$${formulaLastRow},">"&$AH${row})+COUNTIFS($AG$4:$AG$${formulaLastRow},1,$AH$4:$AH$${formulaLastRow},$AH${row},'01 assessment'!$A$4:$A$${formulaLastRow},"<"&'01 assessment'!$A${row}))`];
+  }));
+  dashboard.getRange('AJ4:AJ' + formulaLastRow).setFormulas(Array.from({ length: helperRowCount }, function (_, index) {
+    var row = index + 4;
+    return [`=IF('01 assessment'!$M${row}="","",1+COUNTIFS('01 assessment'!$A$4:$A$${formulaLastRow},"<"&'01 assessment'!$A${row},'01 assessment'!$M$4:$M$${formulaLastRow},"<>")+COUNTIFS('01 assessment'!$A$4:$A$${formulaLastRow},'01 assessment'!$A${row},'01 assessment'!$B$4:$B$${formulaLastRow},">"&'01 assessment'!$B${row},'01 assessment'!$M$4:$M$${formulaLastRow},"<>")+COUNTIFS('01 assessment'!$A$4:$A$${formulaLastRow},'01 assessment'!$A${row},'01 assessment'!$B$4:$B$${formulaLastRow},'01 assessment'!$B${row},'01 assessment'!$M$4:$M$${formulaLastRow},"<"&'01 assessment'!$M${row}))`];
+  }));
+
+  var statuses = ['CLOSED', 'SUBMITTED', 'IN_REVIEW', 'RETURNED'];
+  dashboard.getRange('Q3:R3').setValues([['assessment_status', 'department_count']]);
+  dashboard.getRange('Q4:Q7').setValues(statuses.map(function (status) { return [status]; }));
+  dashboard.getRange('R4:R7').setFormulas(statuses.map(function (_, index) {
+    var row = index + 4;
+    return [`=COUNTIFS($AG$4:$AG$${formulaLastRow},1,'01 assessment'!$C$4:$C$${formulaLastRow},Q${row})`];
+  }));
+
+  dashboard.getRange('AE3:AF3').setValues([['department_name', 'total_risk_score']]);
+  dashboard.getRange('AE4:AE13').setFormulas(Array.from({ length: 10 }, function (_, index) {
+    var row = index + 4;
+    return [`=IFERROR(INDEX('01 assessment'!$A$4:$A$${formulaLastRow},MATCH(ROWS($AE$4:AE${row}),$AI$4:$AI$${formulaLastRow},0)),"")`];
+  }));
+  dashboard.getRange('AF4:AF13').setFormulas(Array.from({ length: 10 }, function (_, index) {
+    var row = index + 4;
+    return [`=IF(AE${row}="","",INDEX($AH$4:$AH$${formulaLastRow},MATCH(ROWS($AF$4:AF${row}),$AI$4:$AI$${formulaLastRow},0)))`];
+  }));
+
+  dashboard.hideColumns(14, 23);
+  dashboard.getRange('U4').setValue(reviewCapacity);
+  dashboard.getRange('A2').setValue('Google Sheets live dashboard · Formulas and charts maintained automatically by OpenRAH01.');
+}
+
+function ensureRah01DashboardCharts_(dashboard, forceChartRebuild) {
+  var charts = dashboard.getCharts();
+  var requiredTitles = ['Total Hazards Identified by Category', 'Risk Assessment Progress Across Departments', 'Top 10 High-Risk Departments'];
+  var existingTitles = charts.map(function (chart) { return String(chart.getOptions().get('title') || ''); });
+  if (!forceChartRebuild && charts.length === 3 && requiredTitles.every(function (title) { return existingTitles.indexOf(title) >= 0; })) return;
+  charts.forEach(function (chart) { dashboard.removeChart(chart); });
+
+  var categoryChart = dashboard.newChart()
+    .setChartType(Charts.ChartType.BAR)
+    .addRange(dashboard.getRange('N3:O11'))
+    .setNumHeaders(1)
+    .setTransposeRowsAndColumns(false)
+    .setHiddenDimensionStrategy(Charts.ChartHiddenDimensionStrategy.SHOW_BOTH)
+    .setPosition(RAH01_DASHBOARD_CHART_FIRST_ROW, RAH01_DASHBOARD_CATEGORY_CHART_COLUMN, 0, 0)
+    .setOption('title', 'Total Hazards Identified by Category')
+    .setOption('legend', { position: 'none' })
+    .setOption('colors', ['#1E6F7A'])
+    .setOption('hAxis', { title: 'Number of Identified Hazards', viewWindow: { min: 0 } })
+    .setOption('vAxis', { title: 'Hazard Category', direction: -1 })
+    .setOption('width', RAH01_DASHBOARD_CHART_WIDTH)
+    .setOption('height', RAH01_DASHBOARD_CHART_HEIGHT)
+    .build();
+  dashboard.insertChart(categoryChart);
+
+  var progressChart = dashboard.newChart()
+    .setChartType(Charts.ChartType.COLUMN)
+    .addRange(dashboard.getRange('Q3:R7'))
+    .setNumHeaders(1)
+    .setTransposeRowsAndColumns(false)
+    .setHiddenDimensionStrategy(Charts.ChartHiddenDimensionStrategy.SHOW_BOTH)
+    .setPosition(RAH01_DASHBOARD_CHART_FIRST_ROW, RAH01_DASHBOARD_PROGRESS_CHART_COLUMN, 0, 0)
+    .setOption('title', 'Risk Assessment Progress Across Departments')
+    .setOption('legend', { position: 'none' })
+    .setOption('colors', ['#1E6F7A'])
+    .setOption('hAxis', { title: 'Assessment Status' })
+    .setOption('vAxis', { title: 'Number of Departments', viewWindow: { min: 0 } })
+    .setOption('width', RAH01_DASHBOARD_CHART_WIDTH)
+    .setOption('height', RAH01_DASHBOARD_CHART_HEIGHT)
+    .build();
+  dashboard.insertChart(progressChart);
+
+  var topRiskChart = dashboard.newChart()
+    .setChartType(Charts.ChartType.BAR)
+    .addRange(dashboard.getRange('AE3:AF13'))
+    .setNumHeaders(1)
+    .setTransposeRowsAndColumns(false)
+    .setHiddenDimensionStrategy(Charts.ChartHiddenDimensionStrategy.SHOW_BOTH)
+    .setPosition(RAH01_DASHBOARD_CHART_FIRST_ROW, RAH01_DASHBOARD_TOP_RISK_CHART_COLUMN, 0, 0)
+    .setOption('title', 'Top 10 High-Risk Departments')
+    .setOption('legend', { position: 'none' })
+    .setOption('colors', ['#1E6F7A'])
+    .setOption('hAxis', { title: 'Total Risk Score', viewWindow: { min: 0 } })
+    .setOption('vAxis', { title: 'Department', direction: -1 })
+    .setOption('width', RAH01_DASHBOARD_CHART_WIDTH)
+    .setOption('height', RAH01_DASHBOARD_CHART_HEIGHT)
+    .build();
+  dashboard.insertChart(topRiskChart);
 }
 
 function ensureRah01DashboardReviewCapacity_(dashboard, requiredRows) {

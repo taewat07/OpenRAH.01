@@ -3,7 +3,14 @@ var RAH01_DATA_ROW = 4;
 var RAH01_MAX_ATTACHMENT_BYTES = 5 * 1024 * 1024;
 var RAH01_MAX_TOTAL_ATTACHMENT_BYTES = 15 * 1024 * 1024;
 var RAH01_DASHBOARD_MIN_REVIEW_ROWS = 150;
-var RAH01_DASHBOARD_FIRST_REVIEW_ROW = 10;
+var RAH01_DASHBOARD_FIRST_REVIEW_ROW = 24;
+var RAH01_DASHBOARD_CHART_FIRST_ROW = 8;
+var RAH01_DASHBOARD_CATEGORY_CHART_COLUMN = 1;
+var RAH01_DASHBOARD_PROGRESS_CHART_COLUMN = 5;
+var RAH01_DASHBOARD_TOP_RISK_CHART_COLUMN = 9;
+var RAH01_DASHBOARD_FORMULA_LAST_ROW = 1000;
+var RAH01_DASHBOARD_CHART_WIDTH = 430;
+var RAH01_DASHBOARD_CHART_HEIGHT = 280;
 
 var RAH01_PROPERTY_KEYS = Object.freeze({
   SPREADSHEET_ID: 'RAH01_SPREADSHEET_ID',
@@ -23,9 +30,9 @@ var RAH01_SHEETS = Object.freeze({
 
 var RAH01_HEADERS = Object.freeze({
   '01 assessment': ['department_name', 'assessment_date', 'status', 'evaluator_name', 'additional_evaluators', 'total_staff_count', 'overall_risk_score', 'overall_risk_level', 'report_number', 'submitted_at', 'department_code', 'department_id', 'assessment_id', 'schema_version', 'form_version'],
-  '02 OH system': ['department_name', 'assessment_date', 'report_number', 'item_order', 'item_label_en', 'status', 'not_applicable_reason', 'item_key', 'assessment_id', 'checklist_response_id'],
+  '02 OH system': ['department_name', 'assessment_date', 'report_number', 'item_order', 'item_label_en', 'status', 'item_key', 'assessment_id', 'checklist_response_id'],
   '03 work process': ['department_name', 'assessment_date', 'report_number', 'step_order', 'work_step', 'primary_hazards', 'work_duration', 'staff_involved_count', 'assessment_id', 'work_step_id'],
-  '04 Hazards': ['department_name', 'assessment_date', 'report_number', 'hazard_order', 'category_label_en', 'hazard_label_en', 'exposed_staff_count', 'exposed_client_count', 'exposure_score_a', 'severity_score_b', 'risk_score_c', 'risk_level', 'existing_controls', 'recommendation', 'has_attachment', 'category_code', 'hazard_key', 'custom_title', 'has_risk', 'assessment_id', 'hazard_evaluation_id', 'has_exposure'],
+  '04 Hazards': ['department_name', 'assessment_date', 'report_number', 'hazard_order', 'category_label_en', 'hazard_label_en', 'exposed_staff_count', 'exposed_client_count', 'exposure_score_a', 'severity_score_b', 'risk_score_c', 'risk_level', 'existing_controls', 'has_attachment', 'category_code', 'hazard_key', 'custom_title', 'has_risk', 'assessment_id', 'hazard_evaluation_id', 'has_exposure'],
   Attachments: ['department_name', 'assessment_date', 'report_number', 'file_name', 'mime_type', 'size_bytes', 'uploaded_at', 'drive_url', 'last_modified', 'drive_file_id', 'assessment_id', 'hazard_evaluation_id', 'attachment_id'],
   AdminLog: ['department_name', 'assessment_date', 'report_number', 'event_at', 'event_type', 'actor', 'admin_note', 'assessment_id', 'log_id'],
   Settings: ['department_name', 'department_code', 'active', 'sort_order', 'department_id']
