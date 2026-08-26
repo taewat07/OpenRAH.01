@@ -16,7 +16,7 @@
   <div class="app-shell">
     <aside class="rail" id="mobileDrawer" aria-label="เมนูส่วนแบบประเมิน" aria-hidden="false">
       <div class="brand">
-        <span class="brand-mark" aria-hidden="true">R1</span>
+        <img class="brand-mark" src="assets/brand/hospital-3d.png" alt="">
         <div class="brand-copy">
           <strong>RAH.01</strong>
           <small>Risk Assessment Form</small>
@@ -28,8 +28,8 @@
         <button class="nav-item active" data-target="header-section"><span class="nav-index">01</span><span class="nav-copy"><strong>ข้อมูลการประเมิน</strong><small>Assessment details</small></span></button>
         <button class="nav-item" data-target="checklist-section"><span class="nav-index">02</span><span class="nav-copy"><strong>ระบบอาชีวอนามัย</strong><small>OH system</small></span></button>
         <button class="nav-item" data-target="steps-section"><span class="nav-index">03</span><span class="nav-copy"><strong>ขั้นตอนการทำงาน</strong><small>Work processes</small></span></button>
-        <button class="nav-item" data-target="hazards-section"><span class="nav-index">04</span><span class="nav-copy"><strong>ประเมินสิ่งคุกคาม</strong><small>Eight categories</small></span></button>
-        <button class="nav-item" data-target="summary-section"><span class="nav-index">05</span><span class="nav-copy"><strong>สรุปความเสี่ยง</strong><small>Derived summary</small></span></button>
+        <button class="nav-item" data-target="hazards-section"><span class="nav-index">04</span><span class="nav-copy"><strong>ประเมินสิ่งคุกคาม</strong><small>Hazard evaluation</small></span></button>
+        <button class="nav-item" data-target="summary-section"><span class="nav-index">05</span><span class="nav-copy"><strong>สรุปความเสี่ยง</strong><small>Risk summary</small></span></button>
       </nav>
     </aside>
 
@@ -78,7 +78,7 @@
 
           <section class="form-section" id="steps-section">
             <div class="section-heading">
-              <div><div class="section-kicker">Section 03</div><h2>ขั้นตอนการทำงาน</h2><p>Work process and task inventory</p></div>
+              <div><div class="section-kicker">Section 03</div><h2>ขั้นตอนการทำงาน</h2><p>Work process</p></div>
               <span class="section-tag" id="stepCount">2 ขั้นตอน</span>
             </div>
             <div class="section-body">
@@ -89,7 +89,7 @@
 
           <section class="form-section" id="hazards-section">
             <div class="section-heading">
-              <div><div class="section-kicker">Section 04</div><h2>ประเมินสิ่งคุกคาม 8 หมวด</h2><p>Hazard evaluation · ตอบทุกแถวอย่างชัดเจน</p></div>
+              <div><div class="section-kicker">Section 04</div><h2>ประเมินสิ่งคุกคาม 8 หมวด</h2><p>Hazard evaluation</p></div>
               <span class="section-tag" id="hazardCount">0 / 49 รายการ</span>
             </div>
             <div class="section-body">
@@ -104,7 +104,7 @@
 
           <section class="form-section" id="summary-section">
             <div class="section-heading">
-              <div><div class="section-kicker">Section 05</div><h2>สรุปความเสี่ยงอัตโนมัติ</h2><p>Derived risk summary · เรียงจากความเสี่ยงสูงสุด</p></div>
+              <div><div class="section-kicker">Section 05</div><h2>สรุปความเสี่ยงอัตโนมัติ</h2><p>Risk summary</p></div>
               <span class="section-tag" id="summaryCount">0 ความเสี่ยง</span>
             </div>
             <div class="section-body" id="summaryBody"></div>
@@ -141,16 +141,16 @@
   <script src="assets/js/rah-department-service.js"></script>
   <script>
     const checklistItems = [
-      { key: 'occ_fire_safety', th: 'มีระบบป้องกัน/ระงับอัคคีภัย', en: 'Fire prevention and suppression system', na: false },
-      { key: 'occ_health_education', th: 'มีการให้ความรู้เรื่องอาชีวอนามัย', en: 'Occupational-health education', na: false },
-      { key: 'occ_waste_management', th: 'มีระบบการจัดการของเสียที่เป็นอันตราย', en: 'Hazardous-waste management system', na: false },
-      { key: 'occ_ppe_measures', th: 'มีมาตรการใช้อุปกรณ์ป้องกันอันตรายส่วนบุคคล', en: 'Personal protective equipment measures', na: false },
-      { key: 'occ_annual_health_exam', th: 'มีการตรวจสุขภาพร่างกายประจำปี', en: 'Annual health examination', na: false },
-      { key: 'occ_risk_exam_lung', th: 'ตรวจสุขภาพตามความเสี่ยง: สมรรถภาพปอด', en: 'Risk-based lung-function examination', na: true },
-      { key: 'occ_risk_exam_hearing', th: 'ตรวจสุขภาพตามความเสี่ยง: การได้ยิน', en: 'Risk-based hearing examination', na: true },
-      { key: 'occ_risk_exam_vision', th: 'ตรวจสุขภาพตามความเสี่ยง: การมองเห็น', en: 'Risk-based vision examination', na: true },
-      { key: 'occ_bio_exam', th: 'การตรวจทางชีวภาพ', en: 'Biological monitoring', na: true },
-      { key: 'occ_env_exam', th: 'การตรวจทางสิ่งแวดล้อม', en: 'Workplace environmental monitoring', na: true }
+      { key: 'occ_fire_safety', th: 'มีระบบป้องกัน/ระงับอัคคีภัย', en: 'Fire prevention and suppression system' },
+      { key: 'occ_health_education', th: 'มีการให้ความรู้เรื่องอาชีวอนามัย', en: 'Occupational-health education' },
+      { key: 'occ_waste_management', th: 'มีระบบการจัดการของเสียที่เป็นอันตราย', en: 'Hazardous-waste management system' },
+      { key: 'occ_ppe_measures', th: 'มีมาตรการใช้อุปกรณ์ป้องกันอันตรายส่วนบุคคล', en: 'Personal protective equipment measures' },
+      { key: 'occ_annual_health_exam', th: 'มีการตรวจสุขภาพร่างกายประจำปี', en: 'Annual health examination' },
+      { key: 'occ_risk_exam_lung', th: 'ตรวจสุขภาพตามความเสี่ยง: สมรรถภาพปอด', en: 'Risk-based lung-function examination' },
+      { key: 'occ_risk_exam_hearing', th: 'ตรวจสุขภาพตามความเสี่ยง: การได้ยิน', en: 'Risk-based hearing examination' },
+      { key: 'occ_risk_exam_vision', th: 'ตรวจสุขภาพตามความเสี่ยง: การมองเห็น', en: 'Risk-based vision examination' },
+      { key: 'occ_bio_exam', th: 'การตรวจทางชีวภาพ', en: 'Biological monitoring' },
+      { key: 'occ_env_exam', th: 'การตรวจทางสิ่งแวดล้อม', en: 'Workplace environmental monitoring' }
     ];
 
     const categories = [
@@ -259,7 +259,7 @@
     function renderChecklist() {
       checklistEl.innerHTML = checklistItems.map((item, index) => {
         const saved = state.checklist[item.key] || {};
-        const values = item.na ? [['YES', 'มี', 'yes'], ['NO', 'ไม่มี', 'no'], ['NOT_APPLICABLE', 'ไม่เกี่ยวข้อง', 'na']] : [['YES', 'มี', 'yes'], ['NO', 'ไม่มี', 'no']];
+        const values = [['YES', 'มี', 'yes'], ['NO', 'ไม่มี', 'no']];
         const selectedIndex = values.findIndex(([value]) => value === saved.status);
         return `<div class="check-row" data-check-key="${item.key}">
           <div class="check-copy"><strong>${index + 1}. ${item.th}</strong><small>${item.en}</small></div>
@@ -267,7 +267,6 @@
             <span class="segment-slider" aria-hidden="true"></span>
             ${values.map(([value, label, className]) => `<button type="button" class="segment ${saved.status === value ? `selected ${className}` : ''}" data-value="${value}" aria-pressed="${saved.status === value}">${label}</button>`).join('')}
           </div>
-          ${item.na ? `<div class="na-reason ${saved.status === 'NOT_APPLICABLE' ? 'visible' : ''}"><input value="${escapeHtml(saved.reason || '')}" placeholder="ระบุเหตุผลที่ไม่เกี่ยวข้อง"></div>` : ''}
         </div>`;
       }).join('');
 
@@ -282,21 +281,14 @@
             item.className = 'segment';
             item.setAttribute('aria-pressed', 'false');
           });
-          const className = button.dataset.value === 'YES' ? 'yes' : button.dataset.value === 'NO' ? 'no' : 'na';
+          const className = button.dataset.value === 'YES' ? 'yes' : 'no';
           button.classList.add('selected', className);
           button.setAttribute('aria-pressed', 'true');
           toggle.dataset.index = String(buttons.indexOf(button));
           toggle.dataset.selected = 'true';
           toggle.dataset.status = button.dataset.value;
-          const reason = row.querySelector('.na-reason');
-          if (reason) reason.classList.toggle('visible', button.dataset.value === 'NOT_APPLICABLE');
           updateProgress();
         }));
-        const reasonInput = row.querySelector('.na-reason input');
-        if (reasonInput) reasonInput.addEventListener('input', () => {
-          state.checklist[key] = state.checklist[key] || {};
-          state.checklist[key].reason = reasonInput.value;
-        });
       });
       updateProgress();
     }
@@ -396,7 +388,7 @@
           <div class="mini-field field-clients"><label>ผู้รับบริการ (คน) <span class="required">*</span></label><input class="hazard-clients" type="number" min="0" value="${escapeHtml(data.clients ?? '')}" placeholder="ระบุจำนวน" required></div>
           <div class="mini-field field-exposure"><label>โอกาสรับสัมผัส A</label>${scoreToggleMarkup('a', data.a, [[1, 'น้อย'], [2, 'ปานกลาง'], [3, 'มาก']], 'โอกาสรับสัมผัส A')}</div>
           <div class="mini-field field-severity"><label>ความรุนแรง B</label>${scoreToggleMarkup('b', data.b, [[1, 'เล็กน้อย'], [2, 'ปานกลาง'], [3, 'ร้ายแรง']], 'ความรุนแรง B')}</div>
-          <div class="mini-field field-controls"><label>วิธีควบคุมที่มีอยู่ <span class="required">*</span></label><textarea class="hazard-controls" placeholder="ระบุวิธีควบคุมความเสี่ยงที่มีอยู่ปัจจุบัน">${escapeHtml(data.controls || '')}</textarea></div>
+          <div class="mini-field field-controls"><label>วิธีควบคุมที่มีอยู่ <small>ไม่บังคับ</small></label><textarea class="hazard-controls" placeholder="ระบุวิธีควบคุมความเสี่ยงที่มีอยู่ปัจจุบัน">${escapeHtml(data.controls || '')}</textarea></div>
           <div class="mini-field field-score"><label>ระดับความเสี่ยง C = A × B</label><div class="score-display ${result ? result.level : 'empty'}" aria-live="polite"><strong class="score-number">${result ? result.score : '—'}</strong><span class="risk-badge ${result ? result.level : 'empty'}">${result ? result.label : 'รอคะแนน'}</span></div>${attachmentMarkup(data, customId ? data.title || 'สิ่งคุกคามอื่น' : th)}</div>
         </div>
       </div>`;
@@ -731,7 +723,7 @@
         return rejectReview(row?.querySelector('.custom-hazard-input'), 'กรุณาระบุชื่อสิ่งคุกคามอื่น');
       }
 
-      const invalidRisk = getRiskRows().find(row => !row.data.a || !row.data.b || !Number.isInteger(row.data.staff) || row.data.staff < 0 || !Number.isInteger(row.data.clients) || row.data.clients < 0 || row.data.staff + row.data.clients < 1 || !String(row.data.controls || '').trim());
+      const invalidRisk = getRiskRows().find(row => !row.data.a || !row.data.b || !Number.isInteger(row.data.staff) || row.data.staff < 0 || !Number.isInteger(row.data.clients) || row.data.clients < 0 || row.data.staff + row.data.clients < 1);
       if (invalidRisk) {
         const row = document.querySelector(`[data-hazard-key="${invalidRisk.key}"]`);
         let target;
@@ -751,9 +743,6 @@
         } else if (invalidRisk.data.staff + invalidRisk.data.clients < 1) {
           target = row?.querySelector('.hazard-staff');
           fieldLabel = 'จำนวนผู้สัมผัสอย่างน้อย 1 คน';
-        } else {
-          target = row?.querySelector('.hazard-controls');
-          fieldLabel = 'วิธีควบคุมที่มีอยู่';
         }
         return rejectReview(target, `กรุณาระบุ${fieldLabel}สำหรับ ${invalidRisk.th}`);
       }
@@ -782,7 +771,7 @@
         checklist: checklistItems.map(item => ({
           itemKey: item.key,
           status: state.checklist[item.key]?.status || null,
-          notApplicableReason: state.checklist[item.key]?.status === 'NOT_APPLICABLE' ? String(state.checklist[item.key]?.reason || '').trim() : null
+          notApplicableReason: null
         })),
         workSteps: state.steps.map((step, index) => ({
           order: index + 1,

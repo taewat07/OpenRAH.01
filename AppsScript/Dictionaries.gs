@@ -1,14 +1,14 @@
 var RAH01_CHECKLIST = Object.freeze({
-  occ_fire_safety: Object.freeze({ label: 'Fire prevention and suppression system', na: false }),
-  occ_health_education: Object.freeze({ label: 'Occupational-health education', na: false }),
-  occ_waste_management: Object.freeze({ label: 'Hazardous-waste management system', na: false }),
-  occ_ppe_measures: Object.freeze({ label: 'Personal protective equipment measures', na: false }),
-  occ_annual_health_exam: Object.freeze({ label: 'Annual health examination', na: false }),
-  occ_risk_exam_lung: Object.freeze({ label: 'Risk-based lung-function examination', na: true }),
-  occ_risk_exam_hearing: Object.freeze({ label: 'Risk-based hearing examination', na: true }),
-  occ_risk_exam_vision: Object.freeze({ label: 'Risk-based vision examination', na: true }),
-  occ_bio_exam: Object.freeze({ label: 'Biological monitoring', na: true }),
-  occ_env_exam: Object.freeze({ label: 'Workplace environmental monitoring', na: true })
+  occ_fire_safety: Object.freeze({ label: 'Fire prevention and suppression system' }),
+  occ_health_education: Object.freeze({ label: 'Occupational-health education' }),
+  occ_waste_management: Object.freeze({ label: 'Hazardous-waste management system' }),
+  occ_ppe_measures: Object.freeze({ label: 'Personal protective equipment measures' }),
+  occ_annual_health_exam: Object.freeze({ label: 'Annual health examination' }),
+  occ_risk_exam_lung: Object.freeze({ label: 'Risk-based lung-function examination' }),
+  occ_risk_exam_hearing: Object.freeze({ label: 'Risk-based hearing examination' }),
+  occ_risk_exam_vision: Object.freeze({ label: 'Risk-based vision examination' }),
+  occ_bio_exam: Object.freeze({ label: 'Biological monitoring' }),
+  occ_env_exam: Object.freeze({ label: 'Workplace environmental monitoring' })
 });
 var RAH01_CATEGORIES = Object.freeze({
   PHYSICAL: 'Physical Hazards', BIOLOGICAL: 'Biological Hazards', CHEMICAL: 'Chemical Hazards',

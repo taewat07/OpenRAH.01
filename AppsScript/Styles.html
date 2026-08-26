@@ -509,10 +509,6 @@ h1, h2, h3 { font-family: var(--font-display); }
     .segment:hover { background: var(--surface); }
     .segment.selected.yes { color: var(--ink); background: var(--green-soft); }
     .segment.selected.no { color: var(--ink); background: var(--coral-soft); }
-    .segment.selected.na { color: var(--teal); background: var(--teal-soft); }
-
-    .na-reason { grid-column: 1 / -1; display: none; }
-    .na-reason.visible { display: block; }
 
     .step-list { display: grid; gap: 12px; }
 
@@ -1373,7 +1369,6 @@ h1, h2, h3 { font-family: var(--font-display); }
     .segment:hover { color: var(--ink); background: var(--lime-soft); }
     .segment.selected.yes { color: var(--ink); background: var(--mint); }
     .segment.selected.no { color: var(--ink); background: var(--coral-soft); }
-    .segment.selected.na { color: var(--ink); background: #a8e5e5; }
 
     .step-number, .category-number { border: 1px solid var(--ink); color: var(--ink); background: var(--lime); }
     .icon-button { border-color: var(--ink); border-radius: 6px; color: var(--coral-dark); background: transparent; }
@@ -1583,15 +1578,14 @@ body::before { display: none; }
 }
 .brand { gap: 13px; margin: 0; padding: 4px 7px 28px; }
 .brand-mark {
-  width: 50px;
-  height: 50px;
-  flex: 0 0 50px;
-  border: 1.5px solid var(--ink);
-  border-radius: 11px;
-  color: var(--ink);
-  background: var(--yellow);
-  font: 800 20px/1 var(--font-mono);
-  text-decoration: none;
+  width: 54px;
+  height: 54px;
+  flex: 0 0 54px;
+  object-fit: contain;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  filter: drop-shadow(0 4px 4px rgba(15, 57, 22, .14));
 }
 .brand strong { color: var(--ink); font-size: var(--text-brand); }
 .brand small { color: var(--ink-soft); font-size: var(--text-supporting); }
@@ -1780,7 +1774,6 @@ input, select, textarea { min-height: 46px; border-radius: var(--radius-md); fon
 .sliding-toggle[data-index="2"] { --segment-index: 2; }
 .sliding-toggle[data-status="NO"],
 .sliding-toggle[data-status="PRESENT"] { --segment-fill: var(--coral-soft); }
-.sliding-toggle[data-status="NOT_APPLICABLE"] { --segment-fill: var(--blue); }
 .sliding-toggle[data-status="ABSENT"] { --segment-fill: var(--mint); }
 .sliding-toggle[data-status="LOW"] { --segment-fill: var(--green); }
 .sliding-toggle[data-status="MEDIUM"] { --segment-fill: var(--risk-medium); }

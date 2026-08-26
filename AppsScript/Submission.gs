@@ -181,11 +181,10 @@ function validateSubmission_(payload, attachmentTransports) {
     if (!definition || seenChecklist[key]) throw new Error('Checklist keys must be canonical and unique.');
     seenChecklist[key] = true;
     var status = requiredText_(item.status, 'Checklist status');
-    if (['YES', 'NO', 'NOT_APPLICABLE'].indexOf(status) < 0) throw new Error('Checklist status is invalid for ' + key + '.');
+    if (['YES', 'NO'].indexOf(status) < 0) throw new Error('Checklist status must be YES or NO for ' + key + '.');
     var reason = boundedText_(item.notApplicableReason, 'N/A reason', 1000);
-    if (status === 'NOT_APPLICABLE' && (!definition.na || !reason)) throw new Error('NOT_APPLICABLE is not valid without an eligible item and reason.');
-    if (status !== 'NOT_APPLICABLE' && reason) throw new Error('N/A reason must be blank for YES or NO.');
-    return { itemKey: key, status: status, notApplicableReason: reason };
+    if (reason) throw new Error('N/A reason is no longer accepted for this checklist.');
+    return { itemKey: key, status: status, notApplicableReason: '' };
   });
 
   var workSteps = Array.isArray(payload.workSteps) ? payload.workSteps : [];
@@ -250,7 +249,7 @@ function validateSubmission_(payload, attachmentTransports) {
       severityScoreB: b,
       riskScore: score,
       riskLevel: hasExposure ? riskLevel_(score) : '',
-      existingControls: hasExposure ? requiredText_(boundedText_(hazard.existingControls, 'Existing controls', 5000), 'Existing controls') : '',
+      existingControls: hasExposure ? boundedText_(hazard.existingControls, 'Existing controls', 5000) : '',
       recommendation: recommendation,
       evidenceAttachment: attachment
     };
