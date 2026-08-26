@@ -30,6 +30,8 @@
   --lime-soft: var(--yellow-soft);
   --amber: #cb8c00;
   --amber-soft: #fff4c5;
+  --hazard-panel: #fffbea;
+  --risk-medium: #ffe7a3;
   --sidebar: 252px;
   --topbar: 42px;
   --content-max: 1320px;
@@ -698,7 +700,7 @@ h1, h2, h3 { font-family: var(--font-display); }
     .score-display strong { font-size: .94rem; }
     .risk-badge { display: inline-flex; min-width: 58px; justify-content: center; padding: 4px 7px; border-radius: 999px; font-size: .64rem; font-weight: 900; }
     .risk-badge.low { color: var(--ink); background: var(--green-soft); }
-    .risk-badge.medium { color: var(--ink); background: var(--amber-soft); }
+    .risk-badge.medium { color: var(--ink); background: var(--risk-medium); }
     .risk-badge.high { color: var(--coral-dark); background: var(--coral-soft); }
     .risk-badge.empty { color: var(--ink-faint); background: var(--paper-deep); }
 
@@ -1384,7 +1386,7 @@ h1, h2, h3 { font-family: var(--font-display); }
     .legend-dot.high { background: var(--coral); }
     .category-list { border-top: var(--section-divider); }
     .category { border-bottom: var(--section-divider); }
-    .category[open] summary { border-bottom: var(--section-divider); background: var(--lime-soft); }
+    .category[open] summary { border-bottom: var(--section-divider); background: var(--hazard-panel); }
     .category-status { border-color: var(--ink); color: var(--ink); background: var(--surface); }
     .category-status.complete { background: var(--mint); }
     .category-status.has-risk { border-color: var(--coral); color: var(--ink); background: var(--coral); }
@@ -1399,11 +1401,11 @@ h1, h2, h3 { font-family: var(--font-display); }
     .score-option[data-value] { color: var(--ink-soft); background: transparent; }
     .score-option[data-value]:hover { color: var(--ink); background: var(--paper-deep); }
     .score-option[data-value="1"].selected { border-color: var(--green); color: var(--ink); background: var(--green); }
-    .score-option[data-value="2"].selected { border-color: var(--amber); color: var(--ink); background: var(--amber-soft); }
+    .score-option[data-value="2"].selected { border-color: var(--amber); color: var(--ink); background: var(--risk-medium); }
     .score-option[data-value="3"].selected { border-color: var(--coral); color: var(--ink); background: var(--coral); }
     .score-display { border-style: solid; border-color: var(--line-strong); background: var(--paper); }
     .score-display.low { border-color: var(--green); color: var(--ink); background: var(--green-soft); }
-    .score-display.medium { border-color: transparent; color: var(--ink); background: var(--amber-soft); }
+    .score-display.medium { border-color: transparent; color: var(--ink); background: var(--risk-medium); }
     .score-display.high { border-color: var(--coral); color: var(--ink); background: var(--coral-soft); }
     .score-display.low,
     .score-display.medium,
@@ -1544,7 +1546,7 @@ h1, h2, h3 { font-family: var(--font-display); }
     @media print {
       .section-heading::after { display: none; }
       body { background: var(--white); }
-      body::before, .rail, .topbar, .sticky-submit, .category-tools, .category-footer, .risk-switch, .icon-button, .add-row, .toast, .drawer-backdrop { display: none !important; }
+      body::before, .rail, .topbar, .sticky-submit, .category-tools, .category-footer, .risk-switch, .exposure-switch, .icon-button, .add-row, .toast, .drawer-backdrop { display: none !important; }
       .app-shell { display: block; }
       .content { width: 100%; padding: 0; }
       .hero { margin: 0 0 12px; padding: 20px; border-radius: 0; color: var(--ink); background: var(--white); box-shadow: none; }
@@ -1674,9 +1676,90 @@ input, select, textarea { min-height: 46px; border-radius: var(--radius-md); fon
 .risk-switch.segmented .risk-choice.selected.present { color: var(--ink); background: var(--coral-soft); }
 .risk-switch.segmented .risk-choice.selected.absent { color: var(--ink); background: var(--mint); }
 
+.hazard-decision {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+}
+.hazard-question-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--ink);
+  font-size: var(--text-label);
+  font-weight: 800;
+}
+.hazard-question-label b {
+  display: inline-grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  background: var(--lime);
+  font-family: var(--font-mono);
+  font-size: .62rem;
+}
+.exposure-gate,
+.no-exposure-note {
+  display: none;
+  animation: reveal .22s ease both;
+}
+.exposure-gate.visible {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  margin: 0 4px 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+.exposure-question { display: grid; gap: 2px; }
+.exposure-question small,
+.risk-assessment-heading small { color: var(--ink-faint); font-size: var(--text-caption); }
+.exposure-switch.segmented {
+  min-width: 248px;
+  padding: 4px;
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+}
+.exposure-switch .exposure-choice {
+  min-width: 0;
+  padding: 7px 9px;
+  border: 0;
+  border-radius: 6px;
+  font-size: .66rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+.no-exposure-note.visible {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin: 0 4px 14px;
+  padding: 11px 14px;
+  border-left: 4px solid var(--green-dark);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--ink);
+  background: var(--mint);
+  font-size: var(--text-caption);
+}
+.no-exposure-note strong { white-space: nowrap; }
+.risk-assessment-heading {
+  display: flex;
+  grid-column: 1 / -1;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--line-strong);
+}
+
 /* Keep summary badges readable even if generic badge styles change later. */
 .summary-table .risk-badge.low { color: var(--ink); background: var(--green); }
-.summary-table .risk-badge.medium { color: var(--ink); background: var(--amber-soft); }
+.summary-table .risk-badge.medium { color: var(--ink); background: var(--risk-medium); }
 .summary-table .risk-badge.high { color: var(--coral-dark); background: var(--coral-soft); }
 
 /* Section 02 and 04 share one sliding selection model. */
@@ -1699,6 +1782,9 @@ input, select, textarea { min-height: 46px; border-radius: var(--radius-md); fon
 .sliding-toggle[data-status="PRESENT"] { --segment-fill: var(--coral-soft); }
 .sliding-toggle[data-status="NOT_APPLICABLE"] { --segment-fill: var(--blue); }
 .sliding-toggle[data-status="ABSENT"] { --segment-fill: var(--mint); }
+.sliding-toggle[data-status="LOW"] { --segment-fill: var(--green); }
+.sliding-toggle[data-status="MEDIUM"] { --segment-fill: var(--risk-medium); }
+.sliding-toggle[data-status="HIGH"] { --segment-fill: var(--coral); }
 .sliding-toggle .segment-slider {
   position: absolute;
   z-index: 0;
@@ -1726,11 +1812,12 @@ input, select, textarea { min-height: 46px; border-radius: var(--radius-md); fon
 .sliding-toggle .segment.selected { color: var(--ink); background: transparent !important; }
 
 .risk-switch.sliding-toggle { min-width: 202px; }
+.score-toggle.sliding-toggle { min-width: 0; }
 
 /* Open hazard categories read as one continuous pale-yellow group. */
 .category[open] > .category-tools,
 .category[open] > .hazard-list,
-.category[open] > .category-footer { background: var(--lime-soft); }
+.category[open] > .category-footer { background: var(--hazard-panel); }
 .category[open] > .hazard-list .hazard-row { background: transparent; }
 
 /* Whole-category negative answer is a positive, low-risk action. */
@@ -1752,6 +1839,14 @@ input, select, textarea { min-height: 46px; border-radius: var(--radius-md); fon
 @media (prefers-reduced-motion: reduce) {
   .sliding-toggle .segment-slider,
   .sliding-toggle .segment { transition: none; }
+}
+
+@media (max-width: 760px) {
+  .hazard-decision { justify-items: stretch; }
+  .exposure-gate.visible { grid-template-columns: 1fr; gap: 9px; margin-right: 0; margin-left: 0; }
+  .exposure-switch.segmented { width: 100%; min-width: 0; }
+  .no-exposure-note.visible { align-items: flex-start; margin-right: 0; margin-left: 0; }
+  .risk-assessment-heading { align-items: flex-start; flex-direction: column; gap: 2px; }
 }
 
 @media (max-width: 1040px) {

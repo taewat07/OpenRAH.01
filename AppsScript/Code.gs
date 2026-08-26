@@ -15,6 +15,7 @@ function setupRah01Production() {
 
   PropertiesService.getScriptProperties().setProperty(RAH01_PROPERTY_KEYS.SPREADSHEET_ID, spreadsheet.getId());
   ensureRah01FormConfiguration_(spreadsheet);
+  ensureRah01HazardExposureColumn_(spreadsheet);
   validateRah01Workbook_(spreadsheet);
 
   var folderId = PropertiesService.getScriptProperties().getProperty(RAH01_PROPERTY_KEYS.ATTACHMENT_FOLDER_ID);
@@ -32,6 +33,31 @@ function setupRah01Production() {
     attachmentFolderId: folder.getId(),
     attachmentFolderName: folder.getName()
   };
+}
+
+function ensureRah01HazardExposureColumn_(spreadsheet) {
+  var sheet = spreadsheet.getSheetByName(RAH01_SHEETS.HAZARDS);
+  if (!sheet) throw new Error('Missing required sheet: ' + RAH01_SHEETS.HAZARDS);
+  var expected = RAH01_HEADERS[RAH01_SHEETS.HAZARDS];
+  var newColumn = expected.length;
+  if (String(sheet.getRange(RAH01_HEADER_ROW, newColumn).getDisplayValue() || '').trim() === 'has_exposure') return;
+  var legacy = expected.slice(0, -1);
+  var actual = sheet.getRange(RAH01_HEADER_ROW, 1, 1, legacy.length).getDisplayValues()[0].map(function (value) { return String(value).trim(); });
+  if (JSON.stringify(actual) !== JSON.stringify(legacy)) return;
+
+  sheet.insertColumnAfter(legacy.length);
+  sheet.getRange(RAH01_HEADER_ROW, legacy.length).copyTo(sheet.getRange(RAH01_HEADER_ROW, newColumn), SpreadsheetApp.CopyPasteType.PASTE_FORMAT, false);
+  sheet.getRange(RAH01_HEADER_ROW, newColumn).setValue('has_exposure');
+  var lastRow = sheet.getLastRow();
+  if (lastRow >= RAH01_DATA_ROW) {
+    sheet.getRange(RAH01_DATA_ROW, legacy.length, lastRow - RAH01_DATA_ROW + 1, 1).copyTo(
+      sheet.getRange(RAH01_DATA_ROW, newColumn, lastRow - RAH01_DATA_ROW + 1, 1),
+      SpreadsheetApp.CopyPasteType.PASTE_FORMAT,
+      false
+    );
+    sheet.getRange(RAH01_DATA_ROW, newColumn, lastRow - RAH01_DATA_ROW + 1, 1).setValue(true);
+  }
+  sheet.setColumnWidth(newColumn, sheet.getColumnWidth(legacy.length));
 }
 
 function ensureRah01FormConfiguration_(spreadsheet) {

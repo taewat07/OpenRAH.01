@@ -350,9 +350,13 @@
     }
 
     function scoreFor(data) {
-      if (!data || !data.hasRisk || !data.a || !data.b) return null;
+      if (!data || !data.hasRisk || !data.hasExposure || !data.a || !data.b) return null;
       const score = Number(data.a) * Number(data.b);
       return { score, level: score <= 2 ? 'low' : score <= 4 ? 'medium' : 'high', label: score <= 2 ? 'ต่ำ' : score <= 4 ? 'ปานกลาง' : 'สูง' };
+    }
+
+    function hazardAnswerComplete(data) {
+      return data?.hasRisk === false || (data?.hasRisk === true && typeof data.hasExposure === 'boolean');
     }
 
     function hazardRowMarkup(category, hazard, customId = null) {
@@ -361,6 +365,16 @@
       const data = customId ? state.customHazards[stateKey] || {} : state.hazards[stateKey] || {};
       const result = scoreFor(data);
       const selectedRiskIndex = data.hasRisk === false ? 1 : 0;
+      const selectedExposureIndex = data.hasExposure === false ? 1 : 0;
+      const scoreToggleMarkup = (property, selectedValue, choices, ariaLabel) => {
+        const numericValue = Number(selectedValue);
+        const hasSelection = choices.some(([value]) => value === numericValue);
+        const status = numericValue === 1 ? 'LOW' : numericValue === 2 ? 'MEDIUM' : numericValue === 3 ? 'HIGH' : '';
+        return `<div class="score-toggle sliding-toggle" role="group" aria-label="${ariaLabel}" data-count="3" data-index="${hasSelection ? numericValue - 1 : 0}" data-selected="${hasSelection}" data-status="${status}">
+          <span class="segment-slider" aria-hidden="true"></span>
+          ${choices.map(([value, label]) => `<button type="button" class="score-option segment ${numericValue === value ? 'selected' : ''}" data-score="${property}" data-value="${value}" aria-pressed="${numericValue === value}"><strong>${value}</strong><span>${label}</span></button>`).join('')}
+        </div>`;
+      };
       const titleBlock = customId
         ? `<div class="custom-title">
             <input class="custom-hazard-input" value="${escapeHtml(data.title || '')}" placeholder="ระบุชื่อสิ่งคุกคามอื่นในหมวดนี้">
@@ -371,17 +385,35 @@
         ${titleBlock}
         <div class="hazard-head">
           <div class="hazard-name"><strong>${customId ? 'สิ่งคุกคามอื่น' : th}</strong><small>${customId ? 'Other hazard' : en}</small></div>
-          <div class="risk-switch segmented sliding-toggle" role="group" aria-label="สถานะความเสี่ยงของ ${customId ? 'สิ่งคุกคามอื่น' : th}" data-count="2" data-index="${selectedRiskIndex}" data-selected="${typeof data.hasRisk === 'boolean'}" data-status="${data.hasRisk === true ? 'PRESENT' : data.hasRisk === false ? 'ABSENT' : ''}">
-            <span class="segment-slider" aria-hidden="true"></span>
-            <button type="button" class="segment risk-choice present ${data.hasRisk === true ? 'selected' : ''}" data-risk="true" aria-pressed="${data.hasRisk === true}">มีความเสี่ยง</button>
-            <button type="button" class="segment risk-choice absent ${data.hasRisk === false ? 'selected' : ''}" data-risk="false" aria-pressed="${data.hasRisk === false}">ไม่มีความเสี่ยง</button>
+          <div class="hazard-decision">
+            <span class="hazard-question-label"><b>1</b> พบสิ่งคุกคามนี้หรือไม่?</span>
+            <div class="risk-switch segmented sliding-toggle" role="group" aria-label="พบสิ่งคุกคาม ${customId ? 'สิ่งคุกคามอื่น' : th} หรือไม่" data-count="2" data-index="${selectedRiskIndex}" data-selected="${typeof data.hasRisk === 'boolean'}" data-status="${data.hasRisk === true ? 'PRESENT' : data.hasRisk === false ? 'ABSENT' : ''}">
+              <span class="segment-slider" aria-hidden="true"></span>
+              <button type="button" class="segment risk-choice present ${data.hasRisk === true ? 'selected' : ''}" data-risk="true" aria-pressed="${data.hasRisk === true}">มี</button>
+              <button type="button" class="segment risk-choice absent ${data.hasRisk === false ? 'selected' : ''}" data-risk="false" aria-pressed="${data.hasRisk === false}">ไม่มี</button>
+            </div>
           </div>
         </div>
-        <div class="risk-fields ${data.hasRisk === true ? 'visible' : ''}">
+        <div class="exposure-gate ${data.hasRisk === true ? 'visible' : ''}">
+          <div class="exposure-question">
+            <span class="hazard-question-label"><b>2</b> มีผู้ที่สัมผัสสิ่งคุกคามนี้หรือไม่?</span>
+            <small>รวมทั้งบุคลากรและผู้รับบริการ</small>
+          </div>
+          <div class="exposure-switch segmented sliding-toggle" role="group" aria-label="มีผู้สัมผัส ${customId ? 'สิ่งคุกคามอื่น' : th} หรือไม่" data-count="2" data-index="${selectedExposureIndex}" data-selected="${typeof data.hasExposure === 'boolean'}" data-status="${data.hasExposure === true ? 'PRESENT' : data.hasExposure === false ? 'ABSENT' : ''}">
+            <span class="segment-slider" aria-hidden="true"></span>
+            <button type="button" class="segment exposure-choice present ${data.hasExposure === true ? 'selected' : ''}" data-exposure="true" aria-pressed="${data.hasExposure === true}">มีผู้สัมผัส</button>
+            <button type="button" class="segment exposure-choice absent ${data.hasExposure === false ? 'selected' : ''}" data-exposure="false" aria-pressed="${data.hasExposure === false}">ไม่มีผู้สัมผัส</button>
+          </div>
+        </div>
+        <div class="no-exposure-note ${data.hasRisk === true && data.hasExposure === false ? 'visible' : ''}" role="status">
+          <strong>จบหัวข้อนี้</strong><span>บันทึกว่าพบสิ่งคุกคาม แต่ไม่มีผู้สัมผัส จึงไม่ต้องประเมินระดับความเสี่ยง</span>
+        </div>
+        <div class="risk-fields ${data.hasRisk === true && data.hasExposure === true ? 'visible' : ''}">
+          <div class="risk-assessment-heading"><span class="hazard-question-label"><b>3</b> ประเมินระดับความเสี่ยง</span><small>กรอกเฉพาะเมื่อมีผู้สัมผัส</small></div>
           <div class="mini-field field-staff"><label>บุคลากร (คน) <span class="required">*</span></label><input class="hazard-staff" type="number" min="0" value="${escapeHtml(data.staff ?? '')}" placeholder="ระบุจำนวน" required></div>
           <div class="mini-field field-clients"><label>ผู้รับบริการ (คน) <span class="required">*</span></label><input class="hazard-clients" type="number" min="0" value="${escapeHtml(data.clients ?? '')}" placeholder="ระบุจำนวน" required></div>
-          <div class="mini-field field-exposure"><label>โอกาสรับสัมผัส A</label><div class="score-toggle" role="group" aria-label="โอกาสรับสัมผัส A">${[[1, 'น้อย'], [2, 'ปานกลาง'], [3, 'มาก']].map(([value, label]) => `<button type="button" class="score-option ${Number(data.a) === value ? 'selected' : ''}" data-score="a" data-value="${value}" aria-pressed="${Number(data.a) === value}"><strong>${value}</strong><span>${label}</span></button>`).join('')}</div></div>
-          <div class="mini-field field-severity"><label>ความรุนแรง B</label><div class="score-toggle" role="group" aria-label="ความรุนแรง B">${[[1, 'เล็กน้อย'], [2, 'ปานกลาง'], [3, 'ร้ายแรง']].map(([value, label]) => `<button type="button" class="score-option ${Number(data.b) === value ? 'selected' : ''}" data-score="b" data-value="${value}" aria-pressed="${Number(data.b) === value}"><strong>${value}</strong><span>${label}</span></button>`).join('')}</div></div>
+          <div class="mini-field field-exposure"><label>โอกาสรับสัมผัส A</label>${scoreToggleMarkup('a', data.a, [[1, 'น้อย'], [2, 'ปานกลาง'], [3, 'มาก']], 'โอกาสรับสัมผัส A')}</div>
+          <div class="mini-field field-severity"><label>ความรุนแรง B</label>${scoreToggleMarkup('b', data.b, [[1, 'เล็กน้อย'], [2, 'ปานกลาง'], [3, 'ร้ายแรง']], 'ความรุนแรง B')}</div>
           <div class="mini-field field-controls"><label>วิธีควบคุมที่มีอยู่ <span class="required">*</span></label><textarea class="hazard-controls" placeholder="ระบุวิธีควบคุมความเสี่ยงที่มีอยู่ปัจจุบัน">${escapeHtml(data.controls || '')}</textarea></div>
           <div class="mini-field field-score"><label>ระดับความเสี่ยง C = A × B</label><div class="score-display ${result ? result.level : 'empty'}" aria-live="polite"><strong class="score-number">${result ? result.score : '—'}</strong><span class="risk-badge ${result ? result.level : 'empty'}">${result ? result.label : 'รอคะแนน'}</span></div>${attachmentMarkup(data, customId ? data.title || 'สิ่งคุกคามอื่น' : th)}</div>
         </div>
@@ -395,15 +427,16 @@
       );
       categoryListEl.innerHTML = categories.map((category, index) => {
         const customs = Object.entries(state.customHazards).filter(([, value]) => value.category === category.code);
-        const answered = category.hazards.filter(([key]) => typeof state.hazards[key]?.hasRisk === 'boolean').length;
+        const answered = category.hazards.filter(([key]) => hazardAnswerComplete(state.hazards[key])).length;
         const present = category.hazards.filter(([key]) => state.hazards[key]?.hasRisk === true).length + customs.filter(([, value]) => value.hasRisk).length;
+        const exposed = category.hazards.filter(([key]) => state.hazards[key]?.hasRisk === true && state.hazards[key]?.hasExposure === true).length + customs.filter(([, value]) => value.hasRisk && value.hasExposure).length;
         const isOpen = hasExistingCategories ? openCategoryCodes.has(category.code) : index === 0;
         return `<details class="category" data-category-code="${category.code}" ${isOpen ? 'open' : ''}>
           <summary>
             <span class="category-number">${String(index + 1).padStart(2, '0')}</span>
             <img class="category-icon" src="${category.icon}" alt="" aria-hidden="true" loading="lazy" decoding="async">
             <span class="category-title"><strong>${category.th}</strong><small>${category.en}</small></span>
-            <span class="category-status ${present > 0 ? 'has-risk' : answered === category.hazards.length ? 'complete' : ''}">${answered} / ${category.hazards.length} · พบ ${present}</span>
+            <span class="category-status ${exposed > 0 ? 'has-risk' : answered === category.hazards.length ? 'complete' : ''}">${answered} / ${category.hazards.length} · พบ ${present} · สัมผัส ${exposed}</span>
             <span class="category-chevron">⌄</span>
           </summary>
           <div class="category-tools">
@@ -460,8 +493,31 @@
           toggle.dataset.index = String(choices.indexOf(button));
           toggle.dataset.selected = 'true';
           toggle.dataset.status = data.hasRisk ? 'PRESENT' : 'ABSENT';
-          row.querySelector('.risk-fields').classList.toggle('visible', data.hasRisk);
+          row.querySelector('.exposure-gate').classList.toggle('visible', data.hasRisk);
+          row.querySelector('.risk-fields').classList.toggle('visible', data.hasRisk && data.hasExposure === true);
+          row.querySelector('.no-exposure-note').classList.toggle('visible', data.hasRisk && data.hasExposure === false);
           if (!data.hasRisk) {
+            row.querySelector('.hazard-attachment').value = '';
+            refreshAttachmentControl(row, null);
+          }
+          refreshHazardRow(row, data);
+          updateAll();
+        }));
+
+        row.querySelectorAll('.exposure-choice').forEach(button => button.addEventListener('click', () => {
+          data.hasExposure = button.dataset.exposure === 'true';
+          if (!data.hasExposure) Object.keys(data).filter(prop => !['hasRisk', 'hasExposure', 'category', 'title'].includes(prop)).forEach(prop => delete data[prop]);
+          const toggle = button.closest('.sliding-toggle');
+          const choices = [...row.querySelectorAll('.exposure-choice')];
+          choices.forEach(choice => choice.classList.remove('selected'));
+          button.classList.add('selected');
+          choices.forEach(choice => choice.setAttribute('aria-pressed', String(choice === button)));
+          toggle.dataset.index = String(choices.indexOf(button));
+          toggle.dataset.selected = 'true';
+          toggle.dataset.status = data.hasExposure ? 'PRESENT' : 'ABSENT';
+          row.querySelector('.risk-fields').classList.toggle('visible', data.hasExposure);
+          row.querySelector('.no-exposure-note').classList.toggle('visible', !data.hasExposure);
+          if (!data.hasExposure) {
             row.querySelector('.hazard-attachment').value = '';
             refreshAttachmentControl(row, null);
           }
@@ -519,12 +575,17 @@
 
         row.querySelectorAll('.score-option').forEach(button => button.addEventListener('click', () => {
           const property = button.dataset.score;
-          data[property] = Number(button.dataset.value);
+          const value = Number(button.dataset.value);
+          data[property] = value;
           row.querySelectorAll(`.score-option[data-score="${property}"]`).forEach(option => {
             const selected = option === button;
             option.classList.toggle('selected', selected);
             option.setAttribute('aria-pressed', String(selected));
           });
+          const toggle = button.closest('.score-toggle');
+          toggle.dataset.index = String(value - 1);
+          toggle.dataset.selected = 'true';
+          toggle.dataset.status = value === 1 ? 'LOW' : value === 2 ? 'MEDIUM' : 'HIGH';
           refreshHazardRow(row, data);
           updateAll();
         }));
@@ -550,21 +611,35 @@
       categories.forEach(category => category.hazards.forEach(([key, th, en]) => {
         const data = state.hazards[key];
         const result = scoreFor(data);
-        if (data?.hasRisk) rows.push({ category, key, th, en, data, result });
+        if (data?.hasRisk && data.hasExposure) rows.push({ category, key, th, en, data, result, custom: false });
+      }));
+      Object.entries(state.customHazards).forEach(([key, data]) => {
+        if (!data.hasRisk || !data.hasExposure) return;
+        const category = categories.find(item => item.code === data.category);
+        rows.push({ category, key, th: data.title || 'สิ่งคุกคามอื่น', en: 'Other hazard', data, result: scoreFor(data), custom: true });
+      });
+      return rows.sort((left, right) => (right.result?.score || 0) - (left.result?.score || 0));
+    }
+
+    function getPresentHazardRows() {
+      const rows = [];
+      categories.forEach(category => category.hazards.forEach(([key, th, en]) => {
+        const data = state.hazards[key];
+        if (data?.hasRisk) rows.push({ category, key, th, en, data, result: scoreFor(data), custom: false });
       }));
       Object.entries(state.customHazards).forEach(([key, data]) => {
         if (!data.hasRisk) return;
         const category = categories.find(item => item.code === data.category);
-        rows.push({ category, key, th: data.title || 'สิ่งคุกคามอื่น', en: 'Other hazard', data, result: scoreFor(data) });
+        rows.push({ category, key, th: data.title || 'สิ่งคุกคามอื่น', en: 'Other hazard', data, result: scoreFor(data), custom: true });
       });
-      return rows.sort((left, right) => (right.result?.score || 0) - (left.result?.score || 0));
+      return rows;
     }
 
     function renderSummary() {
       const rows = getRiskRows();
       document.getElementById('summaryCount').textContent = `${rows.length} ความเสี่ยง`;
       if (!rows.length) {
-        summaryBodyEl.innerHTML = '<div class="summary-empty"><strong>ยังไม่มีรายการความเสี่ยง</strong>เลือกว่า “มีความเสี่ยง” ในหมวดสิ่งคุกคาม แล้วผลสรุปจะปรากฏที่นี่</div>';
+        summaryBodyEl.innerHTML = '<div class="summary-empty"><strong>ยังไม่มีรายการที่ต้องประเมินระดับความเสี่ยง</strong>รายการจะปรากฏเมื่อพบสิ่งคุกคามและมีผู้สัมผัส</div>';
         return;
       }
       summaryBodyEl.innerHTML = `<div class="summary-table-wrap"><table class="summary-table">
@@ -584,7 +659,7 @@
       const checklistComplete = checklistItems.filter(item => Boolean(state.checklist[item.key]?.status)).length;
       const validSteps = state.steps.filter(step => step.work && step.hazards && step.duration && Number(step.staff) > 0).length;
       const hazardTotal = categories.reduce((sum, category) => sum + category.hazards.length, 0);
-      const hazardsComplete = categories.reduce((sum, category) => sum + category.hazards.filter(([key]) => typeof state.hazards[key]?.hasRisk === 'boolean').length, 0);
+      const hazardsComplete = categories.reduce((sum, category) => sum + category.hazards.filter(([key]) => hazardAnswerComplete(state.hazards[key])).length, 0);
       const completed = headerComplete + checklistComplete + validSteps + hazardsComplete;
       const total = 3 + checklistItems.length + state.steps.length + hazardTotal;
       const progress = Math.round((completed / total) * 100);
@@ -603,12 +678,13 @@
       renderSummary();
       categoryListEl.querySelectorAll('.category').forEach(categoryEl => {
         const category = categories.find(item => item.code === categoryEl.dataset.categoryCode);
-        const answered = category.hazards.filter(([key]) => typeof state.hazards[key]?.hasRisk === 'boolean').length;
+        const answered = category.hazards.filter(([key]) => hazardAnswerComplete(state.hazards[key])).length;
         const present = category.hazards.filter(([key]) => state.hazards[key]?.hasRisk === true).length + Object.values(state.customHazards).filter(item => item.category === category.code && item.hasRisk).length;
+        const exposed = category.hazards.filter(([key]) => state.hazards[key]?.hasRisk === true && state.hazards[key]?.hasExposure === true).length + Object.values(state.customHazards).filter(item => item.category === category.code && item.hasRisk && item.hasExposure).length;
         const status = categoryEl.querySelector('.category-status');
-        status.textContent = `${answered} / ${category.hazards.length} · พบ ${present}`;
-        status.classList.toggle('complete', present === 0 && answered === category.hazards.length);
-        status.classList.toggle('has-risk', present > 0);
+        status.textContent = `${answered} / ${category.hazards.length} · พบ ${present} · สัมผัส ${exposed}`;
+        status.classList.toggle('complete', exposed === 0 && answered === category.hazards.length);
+        status.classList.toggle('has-risk', exposed > 0);
       });
     }
 
@@ -674,7 +750,20 @@
         return rejectReview(row?.querySelector('.risk-choice.present'), `ยังประเมินสิ่งคุกคามไม่ครบ ${unansweredCount} รายการ`);
       }
 
-      const invalidRisk = getRiskRows().find(row => !row.data.a || !row.data.b || row.data.staff === undefined || row.data.clients === undefined || !String(row.data.controls || '').trim());
+      const firstUnansweredExposure = getPresentHazardRows().find(row => typeof row.data.hasExposure !== 'boolean');
+      if (firstUnansweredExposure) {
+        const unansweredCount = getPresentHazardRows().filter(row => typeof row.data.hasExposure !== 'boolean').length;
+        const row = document.querySelector(`[data-hazard-key="${firstUnansweredExposure.key}"]`);
+        return rejectReview(row?.querySelector('.exposure-choice.present'), `ยังตอบว่ามีผู้สัมผัสหรือไม่อีก ${unansweredCount} รายการ`);
+      }
+
+      const unnamedCustomHazard = getPresentHazardRows().find(row => row.custom && !String(row.data.title || '').trim());
+      if (unnamedCustomHazard) {
+        const row = document.querySelector(`[data-hazard-key="${unnamedCustomHazard.key}"]`);
+        return rejectReview(row?.querySelector('.custom-hazard-input'), 'กรุณาระบุชื่อสิ่งคุกคามอื่น');
+      }
+
+      const invalidRisk = getRiskRows().find(row => !row.data.a || !row.data.b || !Number.isInteger(row.data.staff) || row.data.staff < 0 || !Number.isInteger(row.data.clients) || row.data.clients < 0 || row.data.staff + row.data.clients < 1 || !String(row.data.controls || '').trim());
       if (invalidRisk) {
         const row = document.querySelector(`[data-hazard-key="${invalidRisk.key}"]`);
         let target;
@@ -685,12 +774,15 @@
         } else if (!invalidRisk.data.b) {
           target = row?.querySelector('.score-option[data-score="b"]');
           fieldLabel = 'ความรุนแรง B';
-        } else if (invalidRisk.data.staff === undefined) {
+        } else if (!Number.isInteger(invalidRisk.data.staff) || invalidRisk.data.staff < 0) {
           target = row?.querySelector('.hazard-staff');
           fieldLabel = 'จำนวนบุคลากร';
-        } else if (invalidRisk.data.clients === undefined) {
+        } else if (!Number.isInteger(invalidRisk.data.clients) || invalidRisk.data.clients < 0) {
           target = row?.querySelector('.hazard-clients');
           fieldLabel = 'จำนวนผู้รับบริการ';
+        } else if (invalidRisk.data.staff + invalidRisk.data.clients < 1) {
+          target = row?.querySelector('.hazard-staff');
+          fieldLabel = 'จำนวนผู้สัมผัสอย่างน้อย 1 คน';
         } else {
           target = row?.querySelector('.hazard-controls');
           fieldLabel = 'วิธีควบคุมที่มีอยู่';
@@ -699,7 +791,7 @@
       }
 
       const payload = buildSubmissionPayload();
-      sessionStorage.setItem('rah01:preview:review:1.1.0', JSON.stringify(payload));
+      sessionStorage.setItem('rah01:preview:review:1.2.0', JSON.stringify(payload));
       window.dispatchEvent(new CustomEvent('rah01:ready-for-review', { detail: payload }));
       showToast('ข้อมูลครบ พร้อมเข้าสู่หน้ายืนยันการส่ง');
       return true;
@@ -710,7 +802,7 @@
       if (!department) throw new Error('A current Settings department is required.');
       return {
         schemaVersion: 'rah01-submission.v1',
-        formVersion: '1.1.0',
+        formVersion: '1.2.0',
         header: {
           assessmentDate: document.getElementById('assessmentDate').value,
           departmentId: department.id,
@@ -731,18 +823,19 @@
           workDuration: String(step.duration || '').trim(),
           staffInvolvedCount: Number(step.staff)
         })),
-        hazardEvaluations: getRiskRows().map(row => ({
+        hazardEvaluations: getPresentHazardRows().map(row => ({
           categoryCode: row.category.code,
           hazardKey: row.custom ? 'OTHER' : row.key,
           customTitle: row.custom ? String(row.data.title || '').trim() : null,
           hasRisk: true,
-          exposedStaffCount: Number(row.data.staff),
-          exposedClientCount: Number(row.data.clients),
-          exposureScoreA: Number(row.data.a),
-          severityScoreB: Number(row.data.b),
-          existingControls: String(row.data.controls || '').trim(),
+          hasExposure: row.data.hasExposure === true,
+          exposedStaffCount: row.data.hasExposure ? Number(row.data.staff) : 0,
+          exposedClientCount: row.data.hasExposure ? Number(row.data.clients) : 0,
+          exposureScoreA: row.data.hasExposure ? Number(row.data.a) : null,
+          severityScoreB: row.data.hasExposure ? Number(row.data.b) : null,
+          existingControls: row.data.hasExposure ? String(row.data.controls || '').trim() : '',
           recommendation: '',
-          evidenceAttachment: row.data.attachment ? {
+          evidenceAttachment: row.data.hasExposure && row.data.attachment ? {
             name: row.data.attachment.name,
             mimeType: row.data.attachment.mimeType,
             sizeBytes: Number(row.data.attachment.sizeBytes) || 0,
@@ -853,7 +946,7 @@
     let submissionInProgress = false;
 
     function attachmentTransportsForSubmission() {
-      return getRiskRows().map(row => row.data.attachment?.dataBase64 ? { dataBase64: row.data.attachment.dataBase64 } : null);
+      return getPresentHazardRows().map(row => row.data.hasExposure && row.data.attachment?.dataBase64 ? { dataBase64: row.data.attachment.dataBase64 } : null);
     }
 
     window.addEventListener('rah01:ready-for-review', async event => {
@@ -870,7 +963,7 @@
         showToast('กรุณาเลือกรูปหลักฐานใหม่ก่อนส่ง');
         return;
       }
-      const requestKey = 'rah01:submission-request:1.1.0';
+      const requestKey = 'rah01:submission-request:1.2.0';
       const requestId = sessionStorage.getItem(requestKey) || crypto.randomUUID();
       sessionStorage.setItem(requestKey, requestId);
       submissionInProgress = true;
@@ -880,7 +973,7 @@
       try {
         const result = await window.RAHDepartmentService.submitAssessment(event.detail, requestId, attachments);
         sessionStorage.removeItem(requestKey);
-        sessionStorage.removeItem('rah01:preview:review:1.1.0');
+        sessionStorage.removeItem('rah01:preview:review:1.2.0');
         submissionInProgress = false;
         button.disabled = false;
         showToast(`ส่งสำเร็จ เลขที่รายงาน ${result.reportNumber}`);

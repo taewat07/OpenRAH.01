@@ -47,6 +47,7 @@ function submitRah01Assessment(payload, requestId, attachmentTransports) {
           hazard_key: hazard.hazardKey,
           custom_title: hazard.customTitle || '',
           has_risk: true,
+          has_exposure: hazard.hasExposure,
           hazard_evaluation_id: hazardId
         }));
         if (file) attachmentRows.push(Object.assign({}, context, {
@@ -159,7 +160,7 @@ function updateRah01AssessmentStatus(assessmentId, status, adminNote) {
 function validateSubmission_(payload, attachmentTransports) {
   if (!payload || typeof payload !== 'object') throw new Error('Submission payload is required.');
   if (payload.schemaVersion !== 'rah01-submission.v1') throw new Error('Unsupported submission schema.');
-  if (payload.formVersion !== '1.1.0') throw new Error('Unsupported form version.');
+  if (payload.formVersion !== '1.2.0') throw new Error('Unsupported form version.');
   var header = payload.header || {};
   var departmentId = requiredText_(header.departmentId, 'Department');
   var department = getDepartmentById_(departmentId);
@@ -215,12 +216,15 @@ function validateSubmission_(payload, attachmentTransports) {
       if (!RAH01_HAZARDS[hazardKey] || RAH01_HAZARDS[hazardKey][0] !== categoryCode || customTitle) throw new Error('Standard hazard key/category is invalid.');
     }
     if (hazard.hasRisk !== true) throw new Error('Version 1 submits only present hazards.');
-    var a = integerInRange_(hazard.exposureScoreA, 'Exposure score A', 1, 3);
-    var b = integerInRange_(hazard.severityScoreB, 'Severity score B', 1, 3);
-    var score = a * b;
+    if (typeof hazard.hasExposure !== 'boolean') throw new Error('Exposure status is required for each present hazard.');
+    var hasExposure = hazard.hasExposure;
+    var a = hasExposure ? integerInRange_(hazard.exposureScoreA, 'Exposure score A', 1, 3) : '';
+    var b = hasExposure ? integerInRange_(hazard.severityScoreB, 'Severity score B', 1, 3) : '';
+    var score = hasExposure ? a * b : '';
     var recommendation = boundedText_(hazard.recommendation, 'Recommendation', 5000);
     var attachment = hazard.evidenceAttachment || null;
     var transport = attachmentTransports[index] || null;
+    if (!hasExposure && attachment) throw new Error('Hazards without exposed people cannot include risk evidence.');
     if (attachment) {
       attachment = {
         name: sanitizeFileName_(attachment.name),
@@ -232,24 +236,29 @@ function validateSubmission_(payload, attachmentTransports) {
       if (!transport || typeof transport.dataBase64 !== 'string') throw new Error('Attachment file bytes are missing for ' + attachment.name + '.');
       totalAttachmentBytes += attachment.sizeBytes;
     } else if (transport) throw new Error('Unexpected attachment transport at hazard ' + (index + 1) + '.');
+    var exposedStaffCount = hasExposure ? nonnegativeInteger_(hazard.exposedStaffCount, 'Exposed staff count') : 0;
+    var exposedClientCount = hasExposure ? nonnegativeInteger_(hazard.exposedClientCount, 'Exposed client count') : 0;
+    if (hasExposure && exposedStaffCount + exposedClientCount < 1) throw new Error('At least one exposed person is required when exposure is present.');
     return {
       categoryCode: categoryCode,
       hazardKey: hazardKey,
       customTitle: customTitle,
-      exposedStaffCount: nonnegativeInteger_(hazard.exposedStaffCount, 'Exposed staff count'),
-      exposedClientCount: nonnegativeInteger_(hazard.exposedClientCount, 'Exposed client count'),
+      hasExposure: hasExposure,
+      exposedStaffCount: exposedStaffCount,
+      exposedClientCount: exposedClientCount,
       exposureScoreA: a,
       severityScoreB: b,
       riskScore: score,
-      riskLevel: riskLevel_(score),
-      existingControls: requiredText_(boundedText_(hazard.existingControls, 'Existing controls', 5000), 'Existing controls'),
+      riskLevel: hasExposure ? riskLevel_(score) : '',
+      existingControls: hasExposure ? requiredText_(boundedText_(hazard.existingControls, 'Existing controls', 5000), 'Existing controls') : '',
       recommendation: recommendation,
       evidenceAttachment: attachment
     };
   });
   if (totalAttachmentBytes > RAH01_MAX_TOTAL_ATTACHMENT_BYTES) throw new Error('Combined attachments exceed 15 MB.');
 
-  var overallRiskScore = hazards.length ? Math.max.apply(null, hazards.map(function (hazard) { return hazard.riskScore; })) : '';
+  var riskScores = hazards.filter(function (hazard) { return hazard.hasExposure; }).map(function (hazard) { return hazard.riskScore; });
+  var overallRiskScore = riskScores.length ? Math.max.apply(null, riskScores) : '';
   return {
     department: department,
     header: {
