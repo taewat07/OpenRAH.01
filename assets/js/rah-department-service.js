@@ -22,12 +22,11 @@
     const department = {
       id: String(source?.id ?? source?.departmentId ?? source?.department_id ?? '').trim(),
       code: String(source?.code ?? '').trim(),
-      nameTh: String(source?.nameTh ?? source?.name_th ?? source?.th ?? '').trim(),
-      nameEn: String(source?.nameEn ?? source?.name_en ?? source?.en ?? '').trim(),
+      name: String(source?.name ?? source?.department_name ?? source?.nameTh ?? source?.name_th ?? source?.th ?? source?.nameEn ?? source?.name_en ?? source?.en ?? '').trim(),
       active: source?.active !== false && String(source?.active).toUpperCase() !== 'FALSE',
       sortOrder: Number(source?.sortOrder ?? source?.sort_order ?? 0)
     };
-    if (!department.id || !department.nameTh) return null;
+    if (!department.id || !department.name) return null;
     return Object.freeze(department);
   }
 
@@ -44,7 +43,7 @@
     });
     const departments = normalizedDepartments
       .filter(department => department.active)
-      .sort((left, right) => left.sortOrder - right.sortOrder || left.nameTh.localeCompare(right.nameTh, 'th'));
+      .sort((left, right) => left.sortOrder - right.sortOrder || left.name.localeCompare(right.name, 'th'));
     return Object.freeze({
       schemaVersion: String(source?.schemaVersion || 'rah01-form-config.v1'),
       hospitalName,

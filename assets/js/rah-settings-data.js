@@ -83,13 +83,12 @@
     return [`แผนกสำรอง ${sequence}`, `Reserved Department ${sequence}`];
   });
 
-  const departments = [...departmentNames, ...reserveDepartmentNames].map(([nameTh, nameEn], index) => {
+  const departments = [...departmentNames, ...reserveDepartmentNames].map(([name], index) => {
     const sequence = String(index + 1).padStart(3, '0');
     return Object.freeze({
       id: `DEPT-${sequence}`,
       code: `D${sequence}`,
-      nameTh,
-      nameEn,
+      name,
       active: index < DEFAULT_ACTIVE_DEPARTMENTS,
       sortOrder: index + 1
     });

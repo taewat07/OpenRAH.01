@@ -54,8 +54,6 @@ function getRah01FormConfig() {
       id: id,
       code: code,
       name: departmentName,
-      nameTh: departmentName,
-      nameEn: '',
       active: settingsBoolean_(row.active, 'Settings active'),
       sortOrder: sortOrder
     };

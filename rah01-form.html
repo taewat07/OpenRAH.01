@@ -344,7 +344,10 @@
       const result = scoreFor(data);
       const selectedRiskIndex = data.hasRisk === false ? 1 : 0;
       const titleBlock = customId
-        ? `<div class="custom-title"><input class="custom-hazard-input" value="${escapeHtml(data.title || '')}" placeholder="ระบุชื่อสิ่งคุกคามอื่นในหมวดนี้"></div>`
+        ? `<div class="custom-title">
+            <input class="custom-hazard-input" value="${escapeHtml(data.title || '')}" placeholder="ระบุชื่อสิ่งคุกคามอื่นในหมวดนี้">
+            <button type="button" class="icon-button remove-custom" aria-label="ลบสิ่งคุกคาม">×</button>
+          </div>`
         : '';
       return `<div class="hazard-row" data-category="${category.code}" data-hazard-key="${stateKey}" data-custom="${customId ? 'true' : 'false'}">
         ${titleBlock}
@@ -354,7 +357,6 @@
             <span class="segment-slider" aria-hidden="true"></span>
             <button type="button" class="segment risk-choice present ${data.hasRisk === true ? 'selected' : ''}" data-risk="true" aria-pressed="${data.hasRisk === true}">มีความเสี่ยง</button>
             <button type="button" class="segment risk-choice absent ${data.hasRisk === false ? 'selected' : ''}" data-risk="false" aria-pressed="${data.hasRisk === false}">ไม่มีความเสี่ยง</button>
-            ${customId ? '<button type="button" class="icon-button remove-custom" aria-label="ลบสิ่งคุกคาม">×</button>' : ''}
           </div>
         </div>
         <div class="risk-fields ${data.hasRisk === true ? 'visible' : ''}">
@@ -680,7 +682,7 @@
         header: {
           assessmentDate: document.getElementById('assessmentDate').value,
           departmentId: department.id,
-          departmentSnapshot: { code: department.code, nameTh: department.nameTh, nameEn: department.nameEn },
+          departmentSnapshot: { code: department.code, nameTh: department.name, nameEn: '' },
           evaluatorName: document.getElementById('evaluator').value.trim(),
           totalStaffCount: Number(document.getElementById('staffTotal').value),
           additionalEvaluators: document.getElementById('additionalEvaluators').value.trim()
@@ -723,7 +725,7 @@
         const config = await window.RAHDepartmentService.loadFormConfig();
         hospitalTitleEl.textContent = `RAH.01 · ${config.hospitalName}`;
         document.title = `RAH.01 — ${config.hospitalName}`;
-        departmentEl.innerHTML = '<option value="">เลือกแผนก</option>' + config.departments.map(department => `<option value="${escapeHtml(department.id)}">${escapeHtml(department.nameTh)}${department.nameEn ? ` · ${escapeHtml(department.nameEn)}` : ''}</option>`).join('');
+        departmentEl.innerHTML = '<option value="">เลือกแผนก</option>' + config.departments.map(department => `<option value="${escapeHtml(department.id)}">${escapeHtml(department.name)}</option>`).join('');
         if (restoredDepartmentId && config.departments.some(department => department.id === restoredDepartmentId)) departmentEl.value = restoredDepartmentId;
         departmentStatusEl.textContent = config.departments.length ? '' : 'ยังไม่มีแผนกที่เปิดใช้งานใน Settings';
         departmentStatusEl.hidden = config.departments.length > 0;

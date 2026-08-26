@@ -651,7 +651,13 @@
     .attachment-remove { flex: 0 0 auto; padding: 4px 2px; border: 0; color: var(--coral-dark, var(--ink)); background: transparent; font-size: .62rem; font-weight: 900; cursor: pointer; }
     .attachment-remove[hidden] { display: none; }
 
-    .custom-title { margin: 10px 4px 0; }
+    .custom-title {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      margin: 10px 4px 0;
+    }
 
     .summary-empty {
       padding: 34px;
