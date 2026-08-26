@@ -279,10 +279,12 @@
       checklistEl.innerHTML = checklistItems.map((item, index) => {
         const saved = state.checklist[item.key] || {};
         const values = item.na ? [['YES', 'มี', 'yes'], ['NO', 'ไม่มี', 'no'], ['NOT_APPLICABLE', 'ไม่เกี่ยวข้อง', 'na']] : [['YES', 'มี', 'yes'], ['NO', 'ไม่มี', 'no']];
+        const selectedIndex = values.findIndex(([value]) => value === saved.status);
         return `<div class="check-row" data-check-key="${item.key}">
           <div class="check-copy"><strong>${index + 1}. ${item.th}</strong><small>${item.en}</small></div>
-          <div class="segmented" role="group" aria-label="${item.th}">
-            ${values.map(([value, label, className]) => `<button type="button" class="segment ${saved.status === value ? `selected ${className}` : ''}" data-value="${value}">${label}</button>`).join('')}
+          <div class="segmented sliding-toggle checklist-toggle" role="group" aria-label="${item.th}" data-count="${values.length}" data-index="${Math.max(selectedIndex, 0)}" data-selected="${selectedIndex >= 0}" data-status="${escapeHtml(saved.status || '')}">
+            <span class="segment-slider" aria-hidden="true"></span>
+            ${values.map(([value, label, className]) => `<button type="button" class="segment ${saved.status === value ? `selected ${className}` : ''}" data-value="${value}" aria-pressed="${saved.status === value}">${label}</button>`).join('')}
           </div>
           ${item.na ? `<div class="na-reason ${saved.status === 'NOT_APPLICABLE' ? 'visible' : ''}"><input value="${escapeHtml(saved.reason || '')}" placeholder="ระบุเหตุผลที่ไม่เกี่ยวข้อง"></div>` : ''}
         </div>`;
@@ -293,9 +295,18 @@
         row.querySelectorAll('.segment').forEach(button => button.addEventListener('click', () => {
           state.checklist[key] = state.checklist[key] || {};
           state.checklist[key].status = button.dataset.value;
-          row.querySelectorAll('.segment').forEach(item => item.className = 'segment');
+          const toggle = button.closest('.checklist-toggle');
+          const buttons = [...row.querySelectorAll('.segment')];
+          buttons.forEach(item => {
+            item.className = 'segment';
+            item.setAttribute('aria-pressed', 'false');
+          });
           const className = button.dataset.value === 'YES' ? 'yes' : button.dataset.value === 'NO' ? 'no' : 'na';
           button.classList.add('selected', className);
+          button.setAttribute('aria-pressed', 'true');
+          toggle.dataset.index = String(buttons.indexOf(button));
+          toggle.dataset.selected = 'true';
+          toggle.dataset.status = button.dataset.value;
           const reason = row.querySelector('.na-reason');
           if (reason) reason.classList.toggle('visible', button.dataset.value === 'NOT_APPLICABLE');
           updateProgress();
@@ -350,6 +361,7 @@
       const stateKey = customId || key;
       const data = customId ? state.customHazards[stateKey] || {} : state.hazards[stateKey] || {};
       const result = scoreFor(data);
+      const selectedRiskIndex = data.hasRisk === false ? 1 : 0;
       const titleBlock = customId
         ? `<div class="custom-title"><input class="custom-hazard-input" value="${escapeHtml(data.title || '')}" placeholder="ระบุชื่อสิ่งคุกคามอื่นในหมวดนี้"></div>`
         : '';
@@ -357,15 +369,16 @@
         ${titleBlock}
         <div class="hazard-head">
           <div class="hazard-name"><strong>${customId ? 'สิ่งคุกคามอื่น' : th}</strong><small>${customId ? 'Other hazard' : en}</small></div>
-          <div class="risk-switch segmented" role="group" aria-label="สถานะความเสี่ยงของ ${customId ? 'สิ่งคุกคามอื่น' : th}">
+          <div class="risk-switch segmented sliding-toggle" role="group" aria-label="สถานะความเสี่ยงของ ${customId ? 'สิ่งคุกคามอื่น' : th}" data-count="2" data-index="${selectedRiskIndex}" data-selected="${typeof data.hasRisk === 'boolean'}" data-status="${data.hasRisk === true ? 'PRESENT' : data.hasRisk === false ? 'ABSENT' : ''}">
+            <span class="segment-slider" aria-hidden="true"></span>
             <button type="button" class="segment risk-choice present ${data.hasRisk === true ? 'selected' : ''}" data-risk="true" aria-pressed="${data.hasRisk === true}">มีความเสี่ยง</button>
             <button type="button" class="segment risk-choice absent ${data.hasRisk === false ? 'selected' : ''}" data-risk="false" aria-pressed="${data.hasRisk === false}">ไม่มีความเสี่ยง</button>
             ${customId ? '<button type="button" class="icon-button remove-custom" aria-label="ลบสิ่งคุกคาม">×</button>' : ''}
           </div>
         </div>
         <div class="risk-fields ${data.hasRisk === true ? 'visible' : ''}">
-          <div class="mini-field field-staff"><label>บุคลากร (คน)</label><input class="hazard-staff" type="number" min="0" value="${escapeHtml(data.staff ?? '')}" placeholder="ระบุจำนวน"></div>
-          <div class="mini-field field-clients"><label>ผู้รับบริการ (คน)</label><input class="hazard-clients" type="number" min="0" value="${escapeHtml(data.clients ?? '')}" placeholder="ระบุจำนวน"></div>
+          <div class="mini-field field-staff"><label>บุคลากร (คน) <span class="required">*</span></label><input class="hazard-staff" type="number" min="0" value="${escapeHtml(data.staff ?? '')}" placeholder="ระบุจำนวน" required></div>
+          <div class="mini-field field-clients"><label>ผู้รับบริการ (คน) <span class="required">*</span></label><input class="hazard-clients" type="number" min="0" value="${escapeHtml(data.clients ?? '')}" placeholder="ระบุจำนวน" required></div>
           <div class="mini-field field-exposure"><label>โอกาสรับสัมผัส A</label><div class="score-toggle" role="group" aria-label="โอกาสรับสัมผัส A">${[[1, 'น้อย'], [2, 'ปานกลาง'], [3, 'มาก']].map(([value, label]) => `<button type="button" class="score-option ${Number(data.a) === value ? 'selected' : ''}" data-score="a" data-value="${value}" aria-pressed="${Number(data.a) === value}"><strong>${value}</strong><span>${label}</span></button>`).join('')}</div></div>
           <div class="mini-field field-severity"><label>ความรุนแรง B</label><div class="score-toggle" role="group" aria-label="ความรุนแรง B">${[[1, 'เล็กน้อย'], [2, 'ปานกลาง'], [3, 'ร้ายแรง']].map(([value, label]) => `<button type="button" class="score-option ${Number(data.b) === value ? 'selected' : ''}" data-score="b" data-value="${value}" aria-pressed="${Number(data.b) === value}"><strong>${value}</strong><span>${label}</span></button>`).join('')}</div></div>
           <div class="mini-field field-controls"><label>วิธีควบคุมที่มีอยู่ <span class="required">*</span></label><textarea class="hazard-controls" placeholder="ระบุวิธีควบคุมความเสี่ยงที่มีอยู่ปัจจุบัน">${escapeHtml(data.controls || '')}</textarea></div>
@@ -438,9 +451,14 @@
         row.querySelectorAll('.risk-choice').forEach(button => button.addEventListener('click', () => {
           data.hasRisk = button.dataset.risk === 'true';
           if (!data.hasRisk) Object.keys(data).filter(prop => !['hasRisk', 'category', 'title'].includes(prop)).forEach(prop => delete data[prop]);
-          row.querySelectorAll('.risk-choice').forEach(choice => choice.classList.remove('selected'));
+          const toggle = button.closest('.sliding-toggle');
+          const choices = [...row.querySelectorAll('.risk-choice')];
+          choices.forEach(choice => choice.classList.remove('selected'));
           button.classList.add('selected');
-          row.querySelectorAll('.risk-choice').forEach(choice => choice.setAttribute('aria-pressed', String(choice === button)));
+          choices.forEach(choice => choice.setAttribute('aria-pressed', String(choice === button)));
+          toggle.dataset.index = String(choices.indexOf(button));
+          toggle.dataset.selected = 'true';
+          toggle.dataset.status = data.hasRisk ? 'PRESENT' : 'ABSENT';
           row.querySelector('.risk-fields').classList.toggle('visible', data.hasRisk);
           if (!data.hasRisk) {
             row.querySelector('.hazard-attachment').value = '';
