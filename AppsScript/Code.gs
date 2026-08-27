@@ -17,6 +17,7 @@ function setupRah01Production() {
   ensureRah01FormConfiguration_(spreadsheet);
   removeRah01DeadColumns_(spreadsheet);
   ensureRah01HazardExposureColumn_(spreadsheet);
+  ensureRah01WorkDurationColumn_(spreadsheet);
   validateRah01Workbook_(spreadsheet);
   installRah01OperationalFormulas_(spreadsheet);
 
@@ -35,6 +36,24 @@ function setupRah01Production() {
     attachmentFolderId: folder.getId(),
     attachmentFolderName: folder.getName()
   };
+}
+
+function ensureRah01WorkDurationColumn_(spreadsheet) {
+  var sheet = spreadsheet.getSheetByName(RAH01_SHEETS.WORK_STEPS);
+  if (!sheet) throw new Error('Missing required sheet: ' + RAH01_SHEETS.WORK_STEPS);
+  var column = RAH01_HEADERS[RAH01_SHEETS.WORK_STEPS].indexOf('work_duration') + 1;
+  var headerCell = sheet.getRange(RAH01_HEADER_ROW, column);
+  var header = String(headerCell.getDisplayValue() || '').trim();
+  if (header === 'work_duration' || header === 'Work Duration Hour') headerCell.setValue('work_duration_hour');
+
+  var rowCount = Math.max(1, sheet.getMaxRows() - RAH01_DATA_ROW + 1);
+  sheet.getRange(RAH01_DATA_ROW, column, rowCount, 1)
+    .setNumberFormat('General')
+    .setDataValidation(SpreadsheetApp.newDataValidation()
+      .requireNumberGreaterThan(0)
+      .setAllowInvalid(false)
+      .setHelpText('Enter work duration as decimal hours, for example 1.5 for 1 hour 30 minutes.')
+      .build());
 }
 
 function removeRah01DeadColumns_(spreadsheet) {

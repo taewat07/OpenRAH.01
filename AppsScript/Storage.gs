@@ -23,7 +23,7 @@ function validateRah01Workbook_(spreadsheet) {
   Object.keys(RAH01_HEADERS).forEach(function (sheetName) {
     var sheet = spreadsheet.getSheetByName(sheetName);
     if (!sheet) throw new Error('Missing required sheet: ' + sheetName);
-    var expected = RAH01_HEADERS[sheetName];
+    var expected = getRah01SheetHeaders_(sheetName);
     var actual = sheet.getRange(RAH01_HEADER_ROW, 1, 1, expected.length).getDisplayValues()[0].map(function (value) { return String(value).trim(); });
     if (JSON.stringify(actual) !== JSON.stringify(expected)) throw new Error('Row 3 headers do not match the contract in ' + sheetName + '.');
   });

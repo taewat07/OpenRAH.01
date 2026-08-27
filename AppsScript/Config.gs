@@ -38,6 +38,14 @@ var RAH01_HEADERS = Object.freeze({
   Settings: ['department_name', 'department_code', 'active', 'sort_order', 'department_id']
 });
 
+var RAH01_SHEET_HEADERS = Object.freeze({
+  '03 work process': ['department_name', 'assessment_date', 'report_number', 'step_order', 'work_step', 'primary_hazards', 'work_duration_hour', 'staff_involved_count', 'assessment_id', 'work_step_id']
+});
+
+function getRah01SheetHeaders_(sheetName) {
+  return RAH01_SHEET_HEADERS[sheetName] || RAH01_HEADERS[sheetName];
+}
+
 function getRah01FormConfig() {
   var settingsSheet = getRah01Spreadsheet_().getSheetByName(RAH01_SHEETS.SETTINGS);
   var settings = getRah01SettingValues_(settingsSheet);
