@@ -60,7 +60,7 @@
             <div class="section-body">
               <div class="field-grid">
                 <div class="field span-3"><label for="assessmentDate">วันที่ทำการประเมิน <span class="required">*</span><small>Assessment date</small></label><input id="assessmentDate" type="date" required></div>
-                <div class="field"><label for="department">งาน / แผนก <span class="required">*</span><small>Assessed department · จากรายการที่ผู้ดูแลกำหนด</small></label><select id="department" name="departmentId" required aria-describedby="departmentStatus"><option value="">กำลังโหลดรายการแผนก…</option></select><small class="field-status" id="departmentStatus" aria-live="polite">กำลังเชื่อมต่อการตั้งค่า</small></div>
+                <div class="field"><label for="departmentSearch">งาน / แผนก <span class="required">*</span><small>Assessed department · ค้นหาจากรายการที่ผู้ดูแลกำหนด</small></label><div class="department-combobox" id="departmentCombobox"><input id="departmentSearch" type="search" role="combobox" autocomplete="off" spellcheck="false" placeholder="กำลังโหลดรายการแผนก…" aria-autocomplete="list" aria-haspopup="listbox" aria-controls="departmentOptions" aria-expanded="false" aria-describedby="departmentStatus" aria-required="true" disabled><input id="department" name="departmentId" type="hidden"><button class="department-toggle" id="departmentToggle" type="button" aria-label="เปิดรายการแผนก" aria-controls="departmentOptions" aria-expanded="false" disabled><span aria-hidden="true"></span></button><div class="department-options" id="departmentOptions" role="listbox" aria-label="รายการแผนก" hidden></div></div><small class="field-status" id="departmentStatus" aria-live="polite">กำลังเชื่อมต่อการตั้งค่า</small></div>
                 <div class="field span-3"><label for="staffTotal">จำนวนผู้ปฏิบัติงานทั้งหมด <span class="required">*</span><small>Total staff</small></label><input id="staffTotal" type="number" min="1" placeholder="ระบุจำนวน" required></div>
                 <div class="field span-4"><label for="evaluator">ผู้ประเมิน <span class="required">*</span><small>Evaluator · ระบุชื่อผู้ประเมิน</small></label><input id="evaluator" placeholder="ระบุชื่อผู้ประเมิน" required></div>
                 <div class="field span-8"><label for="additionalEvaluators">ผู้ร่วมประเมิน<small>Additional evaluators · ไม่บังคับ</small></label><input id="additionalEvaluators" placeholder="ระบุชื่อผู้ร่วมประเมิน"></div>
@@ -184,7 +184,7 @@
       checklist: {},
       hazards: {},
       customHazards: {},
-      steps: [{ work: '', hazards: '', duration: '', staff: '' }]
+      steps: [{ work: '', hazards: '', durationHours: '', durationMinutes: '', staff: '' }]
     };
 
     const checklistEl = document.getElementById('checklist');
@@ -193,14 +193,130 @@
     const summaryBodyEl = document.getElementById('summaryBody');
     const toastEl = document.getElementById('toast');
     const departmentEl = document.getElementById('department');
+    const departmentComboboxEl = document.getElementById('departmentCombobox');
+    const departmentSearchEl = document.getElementById('departmentSearch');
+    const departmentOptionsEl = document.getElementById('departmentOptions');
+    const departmentToggleEl = document.getElementById('departmentToggle');
     const departmentStatusEl = document.getElementById('departmentStatus');
     const hospitalTitleEl = document.getElementById('hospitalTitle');
     const hazardAttachmentAccept = 'image/*';
     let restoredDepartmentId = '';
+    let departmentCatalog = [];
+    let filteredDepartments = [];
+    let activeDepartmentIndex = -1;
 
     function escapeHtml(value) {
       return String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
     }
+
+    function normalizeDepartmentQuery(value) {
+      return String(value || '').normalize('NFKC').trim().toLocaleLowerCase('th-TH');
+    }
+
+    function setDepartmentExpanded(expanded) {
+      const shouldExpand = Boolean(expanded && !departmentSearchEl.disabled);
+      departmentOptionsEl.hidden = !shouldExpand;
+      departmentSearchEl.setAttribute('aria-expanded', String(shouldExpand));
+      departmentToggleEl.setAttribute('aria-expanded', String(shouldExpand));
+      departmentComboboxEl.classList.toggle('open', shouldExpand);
+      if (!shouldExpand) departmentSearchEl.removeAttribute('aria-activedescendant');
+    }
+
+    function syncActiveDepartmentOption() {
+      const options = [...departmentOptionsEl.querySelectorAll('[role="option"]')];
+      options.forEach((option, index) => {
+        const active = index === activeDepartmentIndex;
+        option.classList.toggle('active', active);
+        option.setAttribute('aria-selected', String(option.dataset.departmentId === departmentEl.value));
+        if (active) {
+          departmentSearchEl.setAttribute('aria-activedescendant', option.id);
+          option.scrollIntoView({ block: 'nearest' });
+        }
+      });
+      if (activeDepartmentIndex < 0) departmentSearchEl.removeAttribute('aria-activedescendant');
+    }
+
+    function renderDepartmentOptions(query = departmentSearchEl.value) {
+      const normalizedQuery = normalizeDepartmentQuery(query);
+      filteredDepartments = departmentCatalog.filter(department => {
+        const searchText = normalizeDepartmentQuery(`${department.code} ${department.name}`);
+        return !normalizedQuery || searchText.includes(normalizedQuery);
+      });
+      activeDepartmentIndex = filteredDepartments.findIndex(department => department.id === departmentEl.value);
+      departmentOptionsEl.innerHTML = filteredDepartments.length
+        ? filteredDepartments.map((department, index) => `<button id="department-option-${index}" class="department-option" type="button" role="option" data-department-id="${escapeHtml(department.id)}" aria-selected="${department.id === departmentEl.value}"><span>${escapeHtml(department.name)}</span><small>${escapeHtml(department.code)}</small></button>`).join('')
+        : '<div class="department-empty" role="status">ไม่พบแผนกที่ตรงกับคำค้น</div>';
+      if (normalizedQuery) {
+        departmentStatusEl.textContent = filteredDepartments.length ? `พบ ${filteredDepartments.length} แผนก` : 'ไม่พบแผนกที่ตรงกับคำค้น';
+        departmentStatusEl.hidden = false;
+      } else {
+        departmentStatusEl.textContent = '';
+        departmentStatusEl.hidden = true;
+      }
+      syncActiveDepartmentOption();
+    }
+
+    function selectDepartment(department) {
+      if (!department || !window.RAHDepartmentService.getDepartment(department.id)) return;
+      departmentEl.value = department.id;
+      departmentSearchEl.value = department.name;
+      departmentStatusEl.textContent = '';
+      departmentStatusEl.hidden = true;
+      setDepartmentExpanded(false);
+      departmentEl.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    function moveDepartmentHighlight(direction) {
+      if (!filteredDepartments.length) return;
+      activeDepartmentIndex = activeDepartmentIndex < 0
+        ? (direction > 0 ? 0 : filteredDepartments.length - 1)
+        : (activeDepartmentIndex + direction + filteredDepartments.length) % filteredDepartments.length;
+      syncActiveDepartmentOption();
+    }
+
+    function openDepartmentOptions() {
+      renderDepartmentOptions();
+      setDepartmentExpanded(true);
+    }
+
+    departmentSearchEl.addEventListener('focus', openDepartmentOptions);
+    departmentSearchEl.addEventListener('input', () => {
+      departmentEl.value = '';
+      renderDepartmentOptions();
+      setDepartmentExpanded(true);
+      updateProgress();
+    });
+    departmentSearchEl.addEventListener('keydown', event => {
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        event.preventDefault();
+        if (departmentOptionsEl.hidden) openDepartmentOptions();
+        moveDepartmentHighlight(event.key === 'ArrowDown' ? 1 : -1);
+      } else if (event.key === 'Enter' && !departmentOptionsEl.hidden && activeDepartmentIndex >= 0) {
+        event.preventDefault();
+        selectDepartment(filteredDepartments[activeDepartmentIndex]);
+      } else if (event.key === 'Escape') {
+        event.preventDefault();
+        setDepartmentExpanded(false);
+      } else if (event.key === 'Tab') {
+        setDepartmentExpanded(false);
+      }
+    });
+    departmentToggleEl.addEventListener('click', () => {
+      const wasOpen = departmentComboboxEl.classList.contains('open');
+      departmentSearchEl.focus();
+      if (wasOpen) setDepartmentExpanded(false);
+      else openDepartmentOptions();
+    });
+    departmentOptionsEl.addEventListener('mousedown', event => event.preventDefault());
+    departmentOptionsEl.addEventListener('click', event => {
+      const option = event.target.closest('[data-department-id]');
+      if (!option) return;
+      selectDepartment(window.RAHDepartmentService.getDepartment(option.dataset.departmentId));
+      departmentSearchEl.focus();
+    });
+    document.addEventListener('pointerdown', event => {
+      if (!departmentComboboxEl.contains(event.target)) setDepartmentExpanded(false);
+    });
 
     function showToast(message) {
       toastEl.textContent = message;
@@ -301,7 +417,13 @@
           <div class="mini-field step-hazards"><label>สิ่งคุกคามหลัก</label><textarea data-field="hazards" placeholder="เช่น สารเคมี HCl" required>${escapeHtml(step.hazards)}</textarea></div>
         </div>
         <div class="step-meta-fields">
-          <div class="mini-field duration"><label>ระยะเวลาการทำงาน</label><input data-field="duration" value="${escapeHtml(step.duration)}" placeholder="เช่น 4 ชั่วโมง, 30 นาที" required></div>
+          <div class="mini-field duration">
+            <label>ระยะเวลาการทำงาน</label>
+            <div class="duration-inputs">
+              <label class="duration-input"><span>ชั่วโมง</span><input data-field="durationHours" type="number" inputmode="numeric" min="0" step="1" value="${escapeHtml(step.durationHours)}" placeholder="0" aria-label="ระยะเวลาการทำงาน ชั่วโมง"></label>
+              <label class="duration-input"><span>นาที</span><input data-field="durationMinutes" type="number" inputmode="numeric" min="0" max="59" step="1" value="${escapeHtml(step.durationMinutes)}" placeholder="0" aria-label="ระยะเวลาการทำงาน นาที"></label>
+            </div>
+          </div>
           <div class="mini-field staff"><label>จำนวนคน</label><input data-field="staff" type="number" min="1" value="${escapeHtml(step.staff)}" placeholder="ระบุจำนวน" required></div>
         </div>
         <button class="icon-button remove" type="button" aria-label="ลบขั้นตอน" title="ลบขั้นตอน">×</button>
@@ -310,7 +432,7 @@
       stepListEl.querySelectorAll('.step-card').forEach(card => {
         const index = Number(card.dataset.stepIndex);
         card.querySelectorAll('[data-field]').forEach(input => input.addEventListener('input', () => {
-          state.steps[index][input.dataset.field] = input.type === 'number' ? Number(input.value) : input.value;
+          state.steps[index][input.dataset.field] = input.type === 'number' && input.value !== '' ? Number(input.value) : input.value;
           updateProgress();
         }));
         card.querySelector('.remove').addEventListener('click', () => {
@@ -327,6 +449,14 @@
       if (!data || !data.hasRisk || !data.hasExposure || !data.a || !data.b) return null;
       const score = Number(data.a) * Number(data.b);
       return { score, level: score <= 2 ? 'low' : score <= 4 ? 'medium' : 'high', label: score <= 2 ? 'ต่ำ' : score <= 4 ? 'ปานกลาง' : 'สูง' };
+    }
+
+    function workDurationHours(step) {
+      const hours = step.durationHours === '' ? 0 : Number(step.durationHours);
+      const minutes = step.durationMinutes === '' ? 0 : Number(step.durationMinutes);
+      if (!Number.isInteger(hours) || hours < 0 || !Number.isInteger(minutes) || minutes < 0 || minutes > 59) return null;
+      const total = hours + (minutes / 60);
+      return total > 0 ? total : null;
     }
 
     function hazardAnswerComplete(data) {
@@ -617,7 +747,7 @@
     function updateProgress() {
       const headerComplete = Number(Boolean(document.getElementById('assessmentDate').value)) + Number(Boolean(departmentEl.value)) + Number(Number(document.getElementById('staffTotal').value) > 0);
       const checklistComplete = checklistItems.filter(item => Boolean(state.checklist[item.key]?.status)).length;
-      const validSteps = state.steps.filter(step => step.work && step.hazards && step.duration && Number(step.staff) > 0).length;
+      const validSteps = state.steps.filter(step => step.work && step.hazards && workDurationHours(step) !== null && Number(step.staff) > 0).length;
       const hazardTotal = categories.reduce((sum, category) => sum + category.hazards.length, 0);
       const hazardsComplete = categories.reduce((sum, category) => sum + category.hazards.filter(([key]) => hazardAnswerComplete(state.hazards[key])).length, 0);
       const completed = headerComplete + checklistComplete + validSteps + hazardsComplete;
@@ -684,7 +814,7 @@
       const staffTotal = document.getElementById('staffTotal');
       const evaluator = document.getElementById('evaluator');
       if (!assessmentDate.value) return rejectReview(assessmentDate, 'กรุณาระบุวันที่ทำการประเมิน');
-      if (!departmentEl.value || !window.RAHDepartmentService.getDepartment(departmentEl.value)) return rejectReview(departmentEl, 'กรุณาเลือกแผนกจากรายการที่ผู้ดูแลกำหนด');
+      if (!departmentEl.value || !window.RAHDepartmentService.getDepartment(departmentEl.value)) return rejectReview(departmentSearchEl, 'กรุณาค้นหาและเลือกแผนกจากรายการที่ผู้ดูแลกำหนด');
       if (!(Number(staffTotal.value) > 0)) return rejectReview(staffTotal, 'กรุณาระบุจำนวนผู้ปฏิบัติงานทั้งหมด');
       if (!evaluator.value.trim()) return rejectReview(evaluator, 'กรุณาระบุชื่อผู้ประเมิน');
 
@@ -695,10 +825,10 @@
         return rejectReview(target, `ยังตอบระบบอาชีวอนามัยไม่ครบ ${missingCount} รายการ`);
       }
 
-      const invalidStepIndex = state.steps.findIndex(step => !step.work || !step.hazards || !step.duration || !(Number(step.staff) > 0));
+      const invalidStepIndex = state.steps.findIndex(step => !step.work || !step.hazards || workDurationHours(step) === null || !(Number(step.staff) > 0));
       if (invalidStepIndex >= 0) {
         const step = state.steps[invalidStepIndex];
-        const field = !step.work ? 'work' : !step.hazards ? 'hazards' : !step.duration ? 'duration' : 'staff';
+        const field = !step.work ? 'work' : !step.hazards ? 'hazards' : workDurationHours(step) === null ? 'durationHours' : 'staff';
         const target = stepListEl.querySelector(`[data-step-index="${invalidStepIndex}"] [data-field="${field}"]`);
         return rejectReview(target, `กรุณากรอกข้อมูลขั้นตอนการทำงานที่ ${invalidStepIndex + 1} ให้ครบ`);
       }
@@ -776,7 +906,7 @@
           order: index + 1,
           workStep: String(step.work || '').trim(),
           primaryHazards: String(step.hazards || '').trim(),
-          workDuration: String(step.duration || '').trim(),
+          workDuration: workDurationHours(step),
           staffInvolvedCount: Number(step.staff)
         })),
         hazardEvaluations: getPresentHazardRows().map(row => ({
@@ -805,12 +935,21 @@
         const config = await window.RAHDepartmentService.loadFormConfig();
         hospitalTitleEl.textContent = `RAH.01 · ${config.hospitalName}`;
         document.title = `RAH.01 — ${config.hospitalName}`;
-        departmentEl.innerHTML = '<option value="">เลือกแผนก</option>' + config.departments.map(department => `<option value="${escapeHtml(department.id)}">${escapeHtml(department.name)}</option>`).join('');
-        if (restoredDepartmentId && config.departments.some(department => department.id === restoredDepartmentId)) departmentEl.value = restoredDepartmentId;
+        departmentCatalog = [...config.departments];
+        departmentSearchEl.disabled = !departmentCatalog.length;
+        departmentToggleEl.disabled = !departmentCatalog.length;
+        departmentSearchEl.placeholder = departmentCatalog.length ? 'พิมพ์ชื่อหรือรหัสแผนก' : 'ยังไม่มีแผนกที่เปิดใช้งาน';
+        const restoredDepartment = restoredDepartmentId ? window.RAHDepartmentService.getDepartment(restoredDepartmentId) : null;
+        if (restoredDepartment) selectDepartment(restoredDepartment);
         departmentStatusEl.textContent = config.departments.length ? '' : 'ยังไม่มีแผนกที่เปิดใช้งานใน Settings';
         departmentStatusEl.hidden = config.departments.length > 0;
       } catch (error) {
-        departmentEl.innerHTML = '<option value="">โหลดรายการแผนกไม่สำเร็จ</option>';
+        departmentCatalog = [];
+        departmentEl.value = '';
+        departmentSearchEl.value = '';
+        departmentSearchEl.disabled = true;
+        departmentToggleEl.disabled = true;
+        departmentSearchEl.placeholder = 'โหลดรายการแผนกไม่สำเร็จ';
         departmentStatusEl.textContent = 'ติดต่อผู้ดูแลระบบเพื่อตรวจสอบ Settings';
         departmentStatusEl.hidden = false;
         showToast('โหลดรายการแผนกไม่สำเร็จ');
@@ -819,7 +958,7 @@
     }
 
     document.getElementById('addStepButton').addEventListener('click', () => {
-      state.steps.push({ work: '', hazards: '', duration: '', staff: '' });
+      state.steps.push({ work: '', hazards: '', durationHours: '', durationMinutes: '', staff: '' });
       renderSteps();
       updateProgress();
       stepListEl.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' });

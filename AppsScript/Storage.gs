@@ -323,6 +323,7 @@ function boundedText_(value, label, maximum) { var text = String(value === undef
 function integerInRange_(value, label, minimum, maximum) { var number = Number(value); if (!Number.isInteger(number) || number < minimum || number > maximum) throw new Error(label + ' must be an integer from ' + minimum + ' to ' + maximum + '.'); return number; }
 function positiveInteger_(value, label) { return integerInRange_(value, label, 1, 1000000); }
 function nonnegativeInteger_(value, label) { return integerInRange_(value, label, 0, 1000000); }
+function positiveNumber_(value, label) { var number = Number(value); if (!Number.isFinite(number) || number <= 0) throw new Error(label + ' must be a positive number.'); return number; }
 function asBoolean_(value) { return value === true || value === 1 || String(value).toUpperCase() === 'TRUE' || String(value).toUpperCase() === 'ACTIVE'; }
 function settingsBoolean_(value, label) {
   var normalized = String(value).trim().toUpperCase();

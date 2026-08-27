@@ -191,7 +191,7 @@ function validateSubmission_(payload, attachmentTransports) {
       order: index + 1,
       workStep: requiredText_(boundedText_(step.workStep, 'Work step', 2000), 'Work step'),
       primaryHazards: requiredText_(boundedText_(step.primaryHazards, 'Primary hazards', 2000), 'Primary hazards'),
-      workDuration: requiredText_(boundedText_(step.workDuration, 'ระยะเวลาการทำงาน', 500), 'ระยะเวลาการทำงาน'),
+      workDuration: positiveNumber_(step.workDuration, 'Work duration (hours)'),
       staffInvolvedCount: positiveInteger_(step.staffInvolvedCount, 'Staff involved')
     };
   });
