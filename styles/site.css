@@ -734,7 +734,14 @@ html[lang="th"] .final-cta h2 { line-height: 1.22; }
 figure figcaption { margin-top: 14px; color: var(--color-graphite); font-size: 13px; }
 .sheet-grid { display: grid; margin-top: 64px; grid-template-columns: 1fr 1fr; gap: 38px; }
 
-.final-cta { padding: 112px 0; background: var(--color-ice-wash); }
+.final-cta {
+  padding: 112px 0;
+  background: linear-gradient(
+    to bottom,
+    var(--color-parchment) 0,
+    var(--color-ice-wash) clamp(64px, 10vw, 128px)
+  );
+}
 
 .final-cta__inner {
   display: grid;
