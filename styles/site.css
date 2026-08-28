@@ -692,10 +692,35 @@ figure figcaption { margin-top: 14px; color: var(--color-graphite); font-size: 1
   .demo-note { margin-bottom: 28px; text-align: center; }
   .sheet-grid { margin-top: 48px; grid-template-columns: 1fr; gap: 46px; }
   .final-cta { padding: 84px 0; }
-  .final-cta__inner { grid-template-columns: 1fr; align-items: start; gap: 38px; }
-  .site-footer__inner { grid-template-columns: 1fr; align-items: start; }
-  .site-footer p { text-align: left; }
-  .footer-links { justify-content: flex-start; }
+  .final-cta__inner {
+    grid-template-columns: 1fr;
+    align-items: center;
+    justify-items: center;
+    gap: 38px;
+    text-align: center;
+  }
+  .final-cta__copy { width: 100%; }
+  .final-cta h2 {
+    width: 100%;
+    max-width: 390px;
+    margin-inline: auto;
+    font-size: clamp(26px, 7vw, 30px);
+    line-height: 1.25;
+    text-align: center;
+    text-wrap: balance;
+  }
+  .final-cta h2 span { white-space: normal; }
+  .final-cta__action { margin-inline: auto; }
+  .github-button--large { text-align: center; }
+  .site-footer__inner {
+    grid-template-columns: 1fr;
+    align-items: center;
+    justify-items: center;
+    text-align: center;
+  }
+  .brand--footer { justify-self: center; }
+  .site-footer p { text-align: center; }
+  .footer-links { justify-content: center; }
 }
 
 @media (prefers-reduced-motion: reduce) {
