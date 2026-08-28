@@ -90,7 +90,96 @@
     reveals.forEach(element => observer.observe(element));
   }
 
+  function initializeTearStory() {
+    const story = document.querySelector('[data-tear-story]');
+    if (!story) return;
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let frameId = 0;
+    let enabled = false;
+
+    const clamp = value => Math.min(1, Math.max(0, value));
+    const range = (value, start, end) => clamp((value - start) / (end - start));
+    const smoothStep = value => value * value * (3 - (2 * value));
+
+    function setProgressProperties(progress) {
+      const intro = smoothStep(range(progress, 0, .08));
+      const split = smoothStep(range(progress, .18, .52));
+      const pieces = smoothStep(range(progress, .15, .2));
+      const fallProgress = range(progress, .5, .82);
+      const fall = fallProgress * fallProgress;
+      const fade = smoothStep(range(progress, .66, .84));
+      const message = smoothStep(range(progress, .72, .9));
+
+      story.style.setProperty('--paper-scale', (.975 + (.025 * intro)).toFixed(4));
+      story.style.setProperty('--paper-y', `${(20 * (1 - intro)).toFixed(2)}px`);
+      story.style.setProperty('--base-opacity', (1 - smoothStep(range(progress, .18, .24))).toFixed(4));
+      story.style.setProperty('--piece-opacity', (pieces * (1 - fade)).toFixed(4));
+
+      story.style.setProperty('--left-x', `${((-9 * split) - (5 * fall)).toFixed(3)}vw`);
+      story.style.setProperty('--left-y', `${((-1.5 * split) + (82 * fall)).toFixed(3)}vh`);
+      story.style.setProperty('--left-rotate', `${((-6.5 * split) - (9.5 * fall)).toFixed(3)}deg`);
+      story.style.setProperty('--right-x', `${((8.5 * split) + (4.5 * fall)).toFixed(3)}vw`);
+      story.style.setProperty('--right-y', `${((2.5 * split) + (86 * fall)).toFixed(3)}vh`);
+      story.style.setProperty('--right-rotate', `${((5.5 * split) + (9.5 * fall)).toFixed(3)}deg`);
+      story.style.setProperty('--message-opacity', message.toFixed(4));
+      story.style.setProperty('--message-y', `${(3 - (28 * message)).toFixed(3)}vh`);
+      story.style.setProperty('--message-scale', (.96 + (.04 * message)).toFixed(4));
+    }
+
+    function update() {
+      frameId = 0;
+      if (!enabled) return;
+
+      const rect = story.getBoundingClientRect();
+      const distance = Math.max(1, story.offsetHeight - window.innerHeight);
+      const progress = clamp(-rect.top / distance);
+      setProgressProperties(progress);
+    }
+
+    function scheduleUpdate() {
+      if (!enabled || frameId) return;
+      frameId = window.requestAnimationFrame(update);
+    }
+
+    function handleResize() {
+      scheduleUpdate();
+    }
+
+    function applyMotionPreference() {
+      enabled = !reducedMotion.matches;
+      story.classList.toggle('is-enhanced', enabled);
+      if (enabled) scheduleUpdate();
+      if (!enabled && frameId) {
+        window.cancelAnimationFrame(frameId);
+        frameId = 0;
+      }
+    }
+
+    function alignDirectAnchor() {
+      if (window.location.hash !== '#how-it-works') return;
+
+      const root = document.documentElement;
+      const inlineScrollBehavior = root.style.scrollBehavior;
+      root.style.scrollBehavior = 'auto';
+      window.requestAnimationFrame(() => {
+        window.scrollTo(0, window.scrollY + story.getBoundingClientRect().top);
+        window.requestAnimationFrame(() => {
+          root.style.scrollBehavior = inlineScrollBehavior;
+          scheduleUpdate();
+        });
+      });
+    }
+
+    window.addEventListener('scroll', scheduleUpdate, { passive: true });
+    window.addEventListener('resize', handleResize, { passive: true });
+    reducedMotion.addEventListener?.('change', applyMotionPreference);
+    applyMotionPreference();
+    alignDirectAnchor();
+  }
+
   initializePageScroll();
+  initializeTearStory();
   initializeReveals();
   loadGithubStars();
 })();

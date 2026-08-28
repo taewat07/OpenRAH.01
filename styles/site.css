@@ -366,6 +366,175 @@ html[lang="th"] .final-cta h2 { line-height: 1.22; }
   to { transform: translateX(-50%); }
 }
 
+.tear-story {
+  position: relative;
+  overflow: visible;
+  padding: 120px 0;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(241, 232, 251, .54), transparent 42%),
+    var(--color-parchment);
+  scroll-margin-top: 0;
+}
+
+.tear-story__stage {
+  display: grid;
+  width: min(calc(100% - 48px), 1120px);
+  margin-inline: auto;
+  justify-items: center;
+  gap: 68px;
+}
+
+.tear-story__paper {
+  position: relative;
+  width: 100%;
+  max-width: 1050px;
+  aspect-ratio: 1400 / 856;
+}
+
+.tear-story__base,
+.tear-story__piece {
+  position: absolute;
+  overflow: hidden;
+  inset: 0;
+  border: 1px solid var(--color-line);
+  border-radius: 18px;
+  box-shadow: 0 26px 68px rgba(29, 31, 33, .12);
+}
+
+.tear-story__base img,
+.tear-story__piece img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tear-story__piece { display: none; }
+
+.tear-story__message {
+  color: var(--color-pure-black);
+  text-align: center;
+}
+
+.tear-story__eyebrow {
+  margin: 0 0 20px;
+  color: var(--color-graphite);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.tear-story__message h2 {
+  margin: 0;
+  font-size: clamp(42px, 6vw, 82px);
+  font-weight: 400;
+  letter-spacing: -.055em;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+.tear-story__message h2 span { display: block; }
+
+.tear-story.is-enhanced {
+  height: 170vh;
+  height: 170svh;
+  padding: 0;
+  --base-opacity: 1;
+  --piece-opacity: 0;
+  --paper-opacity: 1;
+  --paper-scale: 1;
+  --paper-y: 0px;
+  --left-x: 0vw;
+  --left-y: 0vh;
+  --left-rotate: 0deg;
+  --right-x: 0vw;
+  --right-y: 0vh;
+  --right-rotate: 0deg;
+  --message-opacity: 0;
+  --message-y: 3vh;
+  --message-scale: .96;
+}
+
+.tear-story.is-enhanced .tear-story__stage {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  min-height: 560px;
+  margin: 0;
+  padding: clamp(28px, 5vh, 64px) 24px;
+  grid-template: 1fr / 1fr;
+  place-items: center;
+  gap: 0;
+  overflow: hidden;
+}
+
+.tear-story.is-enhanced .tear-story__paper,
+.tear-story.is-enhanced .tear-story__message {
+  grid-area: 1 / 1;
+}
+
+.tear-story.is-enhanced .tear-story__paper {
+  width: min(calc(100vw - 48px), 1050px);
+  opacity: var(--paper-opacity);
+  transform: translate3d(0, var(--paper-y), 0) scale(var(--paper-scale));
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+.tear-story.is-enhanced .tear-story__base {
+  opacity: var(--base-opacity);
+  will-change: opacity;
+}
+
+.tear-story.is-enhanced .tear-story__piece {
+  display: block;
+  border: 0;
+  border-radius: 18px;
+  box-shadow: none;
+  opacity: var(--piece-opacity);
+  will-change: transform, opacity;
+}
+
+.tear-story.is-enhanced .tear-story__piece--left {
+  clip-path: polygon(0 0, 50% 0, 49.6% 3%, 50.5% 6%, 49.4% 9%, 50.8% 12%, 49.7% 15%, 50.2% 18%, 49.3% 21%, 50.6% 24%, 49.8% 27%, 50.9% 30%, 49.5% 33%, 50.4% 36%, 49.2% 39%, 50.7% 42%, 49.6% 45%, 50.3% 48%, 49.1% 51%, 50.5% 54%, 49.7% 57%, 50.8% 60%, 49.4% 63%, 50.1% 66%, 49.2% 69%, 50.6% 72%, 49.5% 75%, 50.7% 78%, 49.3% 81%, 50.2% 84%, 49.4% 87%, 50.8% 90%, 49.6% 93%, 50.3% 96%, 49.7% 98%, 50% 100%, 0 100%);
+  filter: drop-shadow(3px 2px 2px rgba(29, 31, 33, .16));
+  transform: translate3d(var(--left-x), var(--left-y), 0) rotate(var(--left-rotate));
+  transform-origin: 50% 50%;
+}
+
+.tear-story.is-enhanced .tear-story__piece--right {
+  clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%, 49.7% 98%, 50.3% 96%, 49.6% 93%, 50.8% 90%, 49.4% 87%, 50.2% 84%, 49.3% 81%, 50.7% 78%, 49.5% 75%, 50.6% 72%, 49.2% 69%, 50.1% 66%, 49.4% 63%, 50.8% 60%, 49.7% 57%, 50.5% 54%, 49.1% 51%, 50.3% 48%, 49.6% 45%, 50.7% 42%, 49.2% 39%, 50.4% 36%, 49.5% 33%, 50.9% 30%, 49.8% 27%, 50.6% 24%, 49.3% 21%, 50.2% 18%, 49.7% 15%, 50.8% 12%, 49.4% 9%, 50.5% 6%, 49.6% 3%);
+  filter: drop-shadow(-3px 2px 2px rgba(29, 31, 33, .16));
+  transform: translate3d(var(--right-x), var(--right-y), 0) rotate(var(--right-rotate));
+  transform-origin: 50% 50%;
+}
+
+.tear-story.is-enhanced .tear-story__message {
+  z-index: 5;
+  width: min(calc(100vw - 48px), 900px);
+  opacity: var(--message-opacity);
+  transform: translate3d(0, var(--message-y), 0) scale(var(--message-scale));
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.tear-story.is-enhanced .tear-story__message h2 {
+  font-size: clamp(48px, 7.2vw, 96px);
+  line-height: 1.08;
+}
+
+.tear-story.is-enhanced + .section--how {
+  position: relative;
+  z-index: 1;
+  margin-top: -47vh;
+  margin-top: -47svh;
+  padding-top: 48px;
+}
+
 .section { padding: 128px 0; }
 
 .section-heading {
@@ -648,7 +817,10 @@ figure figcaption { margin-top: 14px; color: var(--color-graphite); font-size: 1
 @media (max-width: 980px) {
   .section-heading { grid-template-columns: 1fr; gap: 22px; }
   .section-heading > p { max-width: 620px; }
-  .site-footer__inner { grid-template-columns: 1fr 1fr; }
+  .site-footer__inner {
+    grid-template-columns: 1fr auto 1fr;
+    gap: 24px;
+  }
 }
 
 @media (max-width: 760px) {
@@ -678,6 +850,21 @@ figure figcaption { margin-top: 14px; color: var(--color-graphite); font-size: 1
   .principle-group { gap: 56px; padding-right: 56px; }
   .principle-product { gap: 16.5px; font-size: 24px; }
   .principle-product img { width: 54px; height: 54px; flex-basis: 54px; }
+  .tear-story { padding: 88px 0; }
+  .tear-story__stage { width: calc(100% - 32px); gap: 48px; }
+  .tear-story__base,
+  .tear-story__piece { border-radius: 12px; }
+  .tear-story__message h2 { font-size: clamp(36px, 11.2vw, 52px); }
+  .tear-story.is-enhanced { height: 170vh; height: 170svh; }
+  .tear-story.is-enhanced .tear-story__stage { padding: 24px 16px; }
+  .tear-story.is-enhanced .tear-story__paper { width: calc(100vw - 32px); }
+  .tear-story.is-enhanced .tear-story__piece { border-radius: 12px; }
+  .tear-story.is-enhanced .tear-story__message { width: calc(100vw - 40px); }
+  .tear-story.is-enhanced .tear-story__message h2 {
+    font-size: clamp(40px, 12.5vw, 58px);
+    line-height: 1.14;
+  }
+  .tear-story__eyebrow { margin-bottom: 14px; }
   .section { padding: 88px 0; }
   .section-heading { margin-bottom: 48px; }
   .section-heading h2, .final-cta h2 { font-size: 40px; }
@@ -712,6 +899,9 @@ figure figcaption { margin-top: 14px; color: var(--color-graphite); font-size: 1
   .final-cta h2 span { white-space: normal; }
   .final-cta__action { margin-inline: auto; }
   .github-button--large { text-align: center; }
+}
+
+@media (max-width: 599px) {
   .site-footer__inner {
     grid-template-columns: 1fr;
     align-items: center;
@@ -731,4 +921,30 @@ figure figcaption { margin-top: 14px; color: var(--color-graphite); font-size: 1
   .principle-marquee::-webkit-scrollbar { display: none; }
   .principle-track { animation: none !important; transform: none; }
   .principle-group[aria-hidden="true"] { display: none; }
+  .tear-story.is-enhanced { height: auto; padding: 88px 0; }
+  .tear-story.is-enhanced .tear-story__stage {
+    position: relative;
+    width: min(calc(100% - 48px), 1120px);
+    height: auto;
+    min-height: 0;
+    margin-inline: auto;
+    padding: 0;
+    grid-template: none;
+    gap: 68px;
+    overflow: visible;
+  }
+  .tear-story.is-enhanced .tear-story__paper,
+  .tear-story.is-enhanced .tear-story__message { grid-area: auto; }
+  .tear-story.is-enhanced .tear-story__paper {
+    width: 100%;
+    opacity: 1;
+    transform: none;
+  }
+  .tear-story.is-enhanced .tear-story__base { opacity: 1; }
+  .tear-story.is-enhanced .tear-story__piece { display: none; }
+  .tear-story.is-enhanced .tear-story__message {
+    width: 100%;
+    opacity: 1;
+    transform: none;
+  }
 }
