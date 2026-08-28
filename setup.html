@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>
+    (function () {
+      var navigationEntry = typeof performance.getEntriesByType === 'function'
+        ? performance.getEntriesByType('navigation')[0]
+        : null;
+      var isReload = navigationEntry
+        ? navigationEntry.type === 'reload'
+        : performance.navigation && performance.navigation.type === 1;
+      var shouldResetToTop = isReload || !location.hash || location.hash === '#demo';
+
+      if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+      if (!shouldResetToTop) return;
+
+      if (location.hash) {
+        history.replaceState(history.state, '', location.pathname + location.search);
+      }
+
+      var root = document.documentElement;
+      var revealed = false;
+      root.style.visibility = 'hidden';
+      root.style.scrollBehavior = 'auto';
+
+      function revealAtTop() {
+        if (revealed) return;
+        scrollTo(0, 0);
+        requestAnimationFrame(function () {
+          scrollTo(0, 0);
+          root.style.removeProperty('visibility');
+          root.style.removeProperty('scroll-behavior');
+          revealed = true;
+        });
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        requestAnimationFrame(revealAtTop);
+      }, { once: true });
+
+      setTimeout(revealAtTop, 500);
+    }());
+  </script>
+  <meta name="theme-color" content="#f7f7f1">
+  <meta name="description" content="คู่มือติดตั้ง OpenRAH.01 บน Google Sheets และ Apps Script ตั้งแต่เริ่มต้นจนพร้อมใช้งาน">
+  <meta name="author" content="ทีม meowai.work">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="OpenRAH.01">
+  <meta property="og:locale" content="th_TH">
+  <meta property="og:title" content="ขั้นตอนการติดตั้ง OpenRAH.01">
+  <meta property="og:description" content="ติดตั้ง OpenRAH.01 ในบัญชี Google ของคุณตามคู่มือภาพทีละขั้นตอน">
+  <meta property="og:url" content="https://taewat07.github.io/OpenRAH.01/setup.html">
+  <meta property="og:image" content="https://taewat07.github.io/OpenRAH.01/website%20project/demonstrate%20image/21.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ขั้นตอนการติดตั้ง OpenRAH.01">
+  <meta name="twitter:description" content="คู่มือภาพสำหรับติดตั้ง Google Sheets, Apps Script และเผยแพร่เว็บแอป OpenRAH.01">
+  <meta name="twitter:image" content="https://taewat07.github.io/OpenRAH.01/website%20project/demonstrate%20image/21.png">
+  <link rel="canonical" href="https://taewat07.github.io/OpenRAH.01/setup.html">
+  <link rel="icon" href="assets/brand/yellow-hat.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/brand/yellow-hat.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Noto+Sans+Thai:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="website%20project/site.css?v=20260828-21">
+  <link rel="stylesheet" href="website%20project/setup.css?v=20260828-8">
+  <script src="website%20project/setup.js?v=20260828-1" defer></script>
+  <title>ขั้นตอนการติดตั้ง OpenRAH.01</title>
+</head>
+<body class="setup-page">
+  <a class="skip-link" href="#main-content">ข้ามไปยังเนื้อหา</a>
+
+  <header class="site-header" aria-label="เมนูหลัก">
+    <div class="header-inner">
+      <a class="brand" href="index.html" aria-label="กลับไปหน้าแรก OpenRAH.01">
+        <img class="brand-mark" src="assets/brand/yellow-hat.png" alt="">
+        <span>OpenRAH.01</span>
+      </a>
+
+      <nav class="nav-links" aria-label="ส่วนต่าง ๆ ของเว็บไซต์">
+        <a href="index.html#how-it-works">ขั้นตอนการทำงาน</a>
+        <a href="index.html#sheets">Google Sheets</a>
+        <a href="setup.html" aria-current="page">ขั้นตอนการติดตั้ง</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <section class="setup-hero" aria-labelledby="setup-title">
+      <div class="page-shell setup-hero__inner">
+        <p class="setup-kicker">คู่มือการติดตั้ง</p>
+        <h1 id="setup-title">ติดตั้ง OpenRAH.01<br>ในบัญชีของคุณ</h1>
+        <p class="setup-intro">ทำตามภาพทีละขั้นตอน ตั้งแต่อัปโหลด Google Sheets<br>จนได้ลิงก์แบบประเมินพร้อมใช้งาน</p>
+      </div>
+    </section>
+
+    <section class="setup-guide" id="guide" aria-label="คู่มือติดตั้ง OpenRAH.01">
+      <div class="page-shell">
+        <div class="setup-story">
+          <div class="setup-guide__heading">
+            <div class="setup-guide__download">
+              <a class="github-button setup-download" href="https://github.com/taewat07/OpenRAH.01/archive/refs/heads/main.zip" aria-label="ดาวน์โหลดไฟล์ OpenRAH.01 จาก GitHub">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 .7A11.5 11.5 0 0 0 8.36 23.1c.58.1.79-.25.79-.56v-2.23c-3.22.7-3.9-1.37-3.9-1.37-.52-1.34-1.28-1.7-1.28-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.57-.3-5.27-1.28-5.27-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.16 1.18a10.9 10.9 0 0 1 5.76 0c2.2-1.49 3.16-1.18 3.16-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.71 5.38-5.29 5.67.42.36.79 1.06.79 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .7Z"/></svg>
+                <span>ดาวน์โหลด OpenRAH.01 จาก Github</span>
+                <span class="setup-download__arrow" aria-hidden="true">↓</span>
+              </a>
+            </div>
+            <div class="setup-story__trail" aria-hidden="true"><span>↓</span></div>
+            <p class="setup-story__label">แตกไฟล์ ZIP ก่อนเริ่ม</p>
+            <div class="setup-story__trail" aria-hidden="true"><span>↓</span></div>
+          </div>
+
+          <section class="project-tree" aria-labelledby="project-tree-title">
+            <h3 id="project-tree-title">ไฟล์สำหรับติดตั้ง</h3>
+            <pre aria-label="โครงสร้างไฟล์ที่ใช้ติดตั้ง OpenRAH.01"><code><span class="tree-folder">OpenRAH.01-main/</span>
+├── <span class="tree-important">RAH01_Template.xlsx</span> <span class="tree-action">&lt;--- อัปโหลดลง Google Sheets</span>
+└── <span class="tree-folder">AppsScript/</span>
+    ├── Code.gs         ┐
+    ├── Config.gs       │
+    ├── Dictionaries.gs │
+    ├── Storage.gs      │
+    ├── Submission.gs   ├<span class="tree-action">&lt;--- อัปโหลดลง Apps Script</span>
+    ├── Index.html      │
+    ├── Styles.html     │
+    ├── Scripts.html    │
+    └── appsscript.json ┘</code></pre>
+          </section>
+
+          <div class="setup-story__trail" aria-hidden="true"><span>↓</span></div>
+
+          <ol class="setup-steps" aria-label="ขั้นตอนติดตั้ง OpenRAH.01">
+          <li class="setup-step">
+            <div class="setup-step__meta"><span>01</span><h3>อัปโหลดไฟล์ RAH01_Template.xlsx</h3></div>
+            <img src="website%20project/assets/setup-guide/1.webp" width="1600" height="892" fetchpriority="high" alt="ขั้นตอนที่ 1 เปิด Google Sheets แล้วเลือกอัปโหลดไฟล์ RAH01_Template.xlsx">
+          </li>
+          <li class="setup-step">
+            <div class="setup-step__meta"><span>02</span><h3>เลือกไฟล์เทมเพลตจากเครื่อง</h3></div>
+            <img src="website%20project/assets/setup-guide/2.webp?v=20260828-2" width="1600" height="892" loading="lazy" decoding="async" alt="ขั้นตอนที่ 2 เลือกแท็บอัปโหลดและเลือกไฟล์ RAH01_Template.xlsx จากเครื่อง">
+          </li>
+          <li class="setup-step">
+            <div class="setup-step__meta"><span>03</span><h3>เปิดไฟล์ที่อัปโหลดแล้ว</h3></div>
+            <img src="website%20project/assets/setup-guide/3.webp" width="1600" height="892" loading="lazy" decoding="async" alt="ขั้นตอนที่ 3 เปิดไฟล์ RAH01_Template ที่อัปโหลดใน Google Sheets">
+          </li>
+          <li class="setup-step">
+            <div class="setup-step__meta"><span>04</span><h3>ตรวจดูโครงสร้างสมุดงาน</h3></div>
+            <img src="website%20project/assets/setup-guide/4.webp" width="1600" height="892" loading="lazy" decoding="async" alt="ขั้นตอนที่ 4 ตรวจดูชีตข้อมูลทั้งแปดส่วนในเทมเพลต OpenRAH.01">
+          </li>
+          <li class="setup-step">
+            <div class="setup-step__meta"><span>05</span><h3>ตั้งชื่อสมุดงาน โรงพยาบาล และหน่วยงาน</h3></div>
+            <img src="website%20project/assets/setup-guide/5.webp" width="1600" height="885" loading="lazy" decoding="async" alt="ขั้นตอนที่ 5 ตั้งชื่อ Google Sheets ชื่อโรงพยาบาล รายชื่อแผนก และสถานะการแสดงผลในชีต Settings">
+          </li>
+          <li class="setup-step setup-step--chapter">
+            <div class="setup-step__meta"><span>06</span><h3>เปิด Apps Script จาก Google Sheets</h3></div>
+            <img src="website%20project/assets/setup-guide/6.webp" width="1600" height="888" loading="lazy" decoding="async" alt="ขั้นตอนที่ 6 เปิดเมนู Extensions แล้วเลือก Apps Script จาก Google Sheets">
+          </li>
+          <li class="setup-step">
+            <div class="setup-step__meta"><span>07</span><h3>สร้างไฟล์โครงการ Apps Script</h3></div>
+            <img src="website%20project/assets/setup-guide/7.webp" width="1600" height="888" loading="lazy" decoding="async" alt="ขั้นตอนที่ 7 ตั้งชื่อโครงการและสร้างไฟล์ Code Config Dictionaries Storage Submission Index Styles และ Scripts">
+          </li>
+          <li class="setup-step">
+            <div class="setup-step__meta"><span>08</span><h3>ใส่โค้ดให้ครบแปดไฟล์</h3></div>
+            <img src="website%20project/assets/setup-guide/8.webp" width="1600" height="889" loading="lazy" decoding="async" alt="ขั้นตอนที่ 8 ตรวจสอบว่าโครงการ Apps Script มีไฟล์โค้ดครบแปดไฟล์">
+          </li>
+          <li class="setup-step">
+            <div class="setup-step__meta"><span>09</span><h3>เปิดการตั้งค่าโครงการ</h3></div>
+            <img src="website%20project/assets/setup-guide/9.webp" width="1600" height="889" loading="lazy" decoding="async" alt="ขั้นตอนที่ 9 เปิดเมนู Project Settings ใน Apps Script">
+          </li>
+          <li class="setup-step">
+            <div class="setup-step__meta"><span>10</span><h3>แสดงไฟล์ appsscript.json</h3></div>
+            <img src="website%20project/assets/setup-guide/10.webp" width="1600" height="889" loading="lazy" decoding="async" alt="ขั้นตอนที่ 10 เปิดตัวเลือกแสดงไฟล์ appsscript.json ในหน้าแก้ไข">
+          </li>
+          <li class="setup-step">
+            <div class="setup-step__meta"><span>11</span><h3>วางค่า appsscript.json และบันทึก</h3></div>
+            <img src="website%20project/assets/setup-guide/11.webp" width="1600" height="889" loading="lazy" decoding="async" alt="ขั้นตอนที่ 11 วางค่าจากไฟล์ appsscript.json ของโครงการ บันทึก แล้วกลับไปที่ Code.gs">
+          </li>
+          <li class="setup-step setup-step--chapter">
+            <div class="setup-step__meta"><span>12</span><h3>เรียก setupRah01Production</h3></div>
+            <img src="website%20project/assets/setup-guide/12.webp" width="1600" height="889" loading="lazy" decoding="async" alt="ขั้นตอนที่ 12 เลือกฟังก์ชัน setupRah01Production แล้วกด Run เพื่อเริ่มตั้งค่าระบบ">
+          </li>
+          <li class="setup-step">
+            <div class="setup-step__meta"><span>13</span><h3>ตรวจสอบคำขอสิทธิ์</h3></div>
+            <img src="website%20project/assets/setup-guide/13.webp" width="1600" height="885" loading="lazy" decoding="async" alt="ขั้นตอนที่ 13 กด Review permissions เมื่อ Apps Script ขออนุญาตเข้าถึงข้อมูล">
+          </li>
+          <li class="setup-step">
+            <div class="setup-step__meta"><span>14</span><h3>ยืนยันตัวตนตามประเภทบัญชี</h3></div>
+            <img src="website%20project/assets/setup-guide/14.webp" width="1600" height="885" loading="lazy" decoding="async" alt="ขั้นตอนที่ 14 ยืนยันสิทธิ์ด้วยบัญชีองค์กร หรือเปิด Advanced และยืนยันสำหรับบัญชี Gmail ทั่วไป">
+          </li>
+          <li class="setup-step">
+            <div class="setup-step__meta"><span>15</span><h3>เลือกสิทธิ์ทั้งหมดแล้วดำเนินการต่อ</h3></div>
+            <img src="website%20project/assets/setup-guide/15.webp" width="1600" height="885" loading="lazy" decoding="async" alt="ขั้นตอนที่ 15 เลือกอนุญาตสิทธิ์เข้าถึง Google Drive และ Google Sheets ทั้งหมด แล้วกด Continue">
+          </li>
+          <li class="setup-step">
+            <div class="setup-step__meta"><span>16</span><h3>รอจนการตั้งค่าเสร็จสมบูรณ์</h3></div>
+            <img src="website%20project/assets/setup-guide/16.webp" width="1600" height="885" loading="lazy" decoding="async" alt="ขั้นตอนที่ 16 รอจน Execution log แสดงข้อความ Execution completed">
+          </li>
+          <li class="setup-step">
+            <div class="setup-step__meta"><span>17</span><h3>ล้างข้อมูลตัวอย่าง</h3></div>
+            <img src="website%20project/assets/setup-guide/17.webp" width="1600" height="885" loading="lazy" decoding="async" alt="ขั้นตอนที่ 17 เลือกฟังก์ชัน clearBundledSyntheticData กด Run และรอจนล้างข้อมูลตัวอย่างเสร็จ">
+          </li>
+          <li class="setup-step setup-step--chapter">
+            <div class="setup-step__meta"><span>18</span><h3>สร้าง Deployment ใหม่</h3></div>
+            <img src="website%20project/assets/setup-guide/18.webp" width="1600" height="885" loading="lazy" decoding="async" alt="ขั้นตอนที่ 18 เปิดเมนู Deploy แล้วเลือก New deployment">
+          </li>
+          <li class="setup-step">
+            <div class="setup-step__meta"><span>19</span><h3>เลือกประเภท Web app</h3></div>
+            <img src="website%20project/assets/setup-guide/19.webp" width="1600" height="885" loading="lazy" decoding="async" alt="ขั้นตอนที่ 19 เลือกประเภทการเผยแพร่เป็น Web app">
+          </li>
+          <li class="setup-step">
+            <div class="setup-step__meta"><span>20</span><h3>กำหนดผู้มีสิทธิ์ใช้งานและ Deploy</h3></div>
+            <img src="website%20project/assets/setup-guide/20.webp" width="1600" height="885" loading="lazy" decoding="async" alt="ขั้นตอนที่ 20 ตั้งชื่อ เลือกให้รันด้วยบัญชีของเจ้าของ กำหนดผู้มีสิทธิ์ใช้งาน แล้วกด Deploy">
+          </li>
+          <li class="setup-step setup-step--complete">
+            <div class="setup-step__meta"><span>21</span><h3>คัดลอกลิงก์เว็บแอปไปใช้งาน</h3></div>
+            <img src="website%20project/assets/setup-guide/21.webp" width="1600" height="885" loading="lazy" decoding="async" alt="ขั้นตอนที่ 21 คัดลอก URL ของเว็บแอปเพื่อให้หน่วยงานใช้งาน และเก็บลิงก์ไว้ภายในองค์กร">
+          </li>
+          </ol>
+
+          <div class="setup-story__trail setup-story__trail--finish" aria-hidden="true"><span>↓</span></div>
+
+          <section class="setup-finish" aria-labelledby="finish-title">
+            <div class="setup-finish__celebration" aria-hidden="true">
+              <span class="party-popper party-popper--left">🎉</span>
+              <span class="party-popper party-popper--right">🎉</span>
+              <div class="party-confetti"></div>
+            </div>
+            <div class="setup-finish__content">
+              <p class="setup-kicker">ติดตั้งเสร็จแล้ว</p>
+              <h2 id="finish-title">พร้อมเริ่มประเมิน<br>ความเสี่ยงหน่วยงาน</h2>
+              <a class="button button--primary" href="index.html">กลับไปหน้าแรก</a>
+            </div>
+            <p class="sr-only" aria-live="polite" data-celebration-status></p>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="page-shell site-footer__inner">
+      <div class="brand brand--footer"><img class="brand-mark" src="assets/brand/yellow-hat.png" alt=""><span>OpenRAH.01</span></div>
+      <p>พัฒนาโดยทีม <a class="footer-contact" href="https://meowai.work" target="_blank" rel="noreferrer">meowai.work</a><br><a class="footer-contact" href="mailto:mohtewat@gmail.com">mohtewat@gmail.com</a></p>
+      <div class="footer-links">
+        <a href="https://github.com/taewat07/OpenRAH.01" target="_blank" rel="noreferrer">GitHub</a>
+        <a href="https://github.com/taewat07/OpenRAH.01/blob/main/LICENSE" target="_blank" rel="noreferrer">MIT license</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

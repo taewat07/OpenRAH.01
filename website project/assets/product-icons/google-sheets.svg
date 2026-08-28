@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-labelledby="title">
+  <title id="title">Google Sheets</title>
+  <path fill="#0F9D58" d="M11 4h18l8 8v30a2 2 0 0 1-2 2H11a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/>
+  <path fill="#087F45" d="M29 4v8h8Z"/>
+  <path fill="#FFF" d="M15 19h16v17H15Zm2 2v3h5v-3Zm7 0v3h5v-3Zm-7 5v3h5v-3Zm7 0v3h5v-3Zm-7 5v3h5v-3Zm7 0v3h5v-3Z"/>
+</svg>
