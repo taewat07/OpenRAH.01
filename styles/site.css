@@ -1,6 +1,7 @@
 :root {
   --color-electric-cobalt: #244cff;
   --color-lavender-mist: #c3aeff;
+  --color-site-canvas: #edf3f6;
   --color-parchment: #f7f7f1;
   --color-snow: #ffffff;
   --color-ice-wash: #e8f8ff;
@@ -44,7 +45,7 @@ body {
   margin: 0;
   overflow-x: hidden;
   color: var(--color-pure-black);
-  background: var(--color-parchment);
+  background: var(--color-site-canvas);
   font-family: var(--font-ui);
   font-feature-settings: "cv03", "cv04", "cv09", "cv11";
   font-size: 16px;
@@ -85,7 +86,7 @@ svg { display: block; }
   position: relative;
   z-index: 20;
   height: var(--header-height);
-  background: var(--color-parchment);
+  background: var(--color-site-canvas);
 }
 
 .header-inner {
@@ -175,7 +176,7 @@ svg { display: block; }
 .hero {
   overflow: hidden;
   padding: 70px 0 0;
-  background: var(--color-parchment);
+  background: var(--color-site-canvas);
 }
 
 .hero-stage {
@@ -372,7 +373,7 @@ html[lang="th"] .final-cta h2 { line-height: 1.22; }
   padding: 120px 0;
   background:
     radial-gradient(circle at 50% 42%, rgba(241, 232, 251, .54), transparent 42%),
-    var(--color-parchment);
+    var(--color-site-canvas);
   scroll-margin-top: 0;
 }
 
@@ -745,7 +746,7 @@ figure figcaption { margin-top: 14px; color: var(--color-graphite); font-size: 1
   padding: 112px 0;
   background: linear-gradient(
     to bottom,
-    var(--color-parchment) 0,
+    var(--color-site-canvas) 0,
     var(--color-ice-wash) clamp(64px, 10vw, 128px)
   );
 }
