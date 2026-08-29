@@ -562,6 +562,13 @@ html[lang="th"] .final-cta h2 { line-height: 1.22; }
   line-height: 1.7;
 }
 
+.copy-underline {
+  text-decoration-line: underline;
+  text-decoration-thickness: .08em;
+  text-underline-offset: .16em;
+  text-decoration-skip-ink: auto;
+}
+
 .data-flow {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 76px minmax(0, 1fr);
